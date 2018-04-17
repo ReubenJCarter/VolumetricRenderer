@@ -12,6 +12,7 @@
 RenderViewport::RenderViewport()
 {
 	setFocusPolicy(Qt::ClickFocus);
+	renderType = SLICE_RENDER; 
 }
 
 void RenderViewport::initializeGL()
@@ -171,4 +172,19 @@ void RenderViewport::LoadLUT(float* buffer, int sizeLUT)
 	textureLUT->LoadData(buffer);
 	
 	update();
+}
+
+void RenderViewport::ChooseRenderer(RENDER_TYPE rt)
+{
+	renderType = rt; 
+	if(renderType == SLICE_RENDER)
+	{
+		textureVolumeObject->SetVisible(true); 
+		rayVolumeObject->SetVisible(false); 
+	}
+	else if(renderType == RAY_RENDER)
+	{
+		textureVolumeObject->SetVisible(false); 
+		rayVolumeObject->SetVisible(true); 
+	}
 }

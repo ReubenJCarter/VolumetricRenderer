@@ -46,6 +46,19 @@ MainWindow::MainWindow()
 		}
 	});
 	
+	QObject::connect(controlPanel.comboRenderer, QOverload<const QString &>::of(&QComboBox::currentIndexChanged), [this](const QString &text)
+	{
+		if(text == QString("Slice"))
+		{
+			renderViewport.ChooseRenderer(RenderViewport::SLICE_RENDER);
+		}
+		else if(text == QString("Ray"))
+		{
+			renderViewport.ChooseRenderer(RenderViewport::RAY_RENDER);
+		}
+		renderViewport.update();
+	});
+	
 	QObject::connect(controlPanel.imageSettings->sampleMapping, &SampleMappingEditor::CurveChanged, [this]()
 	{
 		int sizeLUT = 256; 

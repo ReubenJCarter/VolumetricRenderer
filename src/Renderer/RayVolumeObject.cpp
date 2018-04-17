@@ -37,7 +37,8 @@ layout(location = 0) out vec4 outputColor;
 //main
 void main()
 {
-	
+	vec3 rayOrig;
+	vec3 rayDir; 
   	outputColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 }
 )";

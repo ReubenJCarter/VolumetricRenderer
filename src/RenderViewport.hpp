@@ -31,6 +31,8 @@ class RenderViewport: public QOpenGLWidget
 		void keyReleaseEvent(QKeyEvent *event);
 		
 	public:
+		enum RENDER_TYPE{SLICE_RENDER, RAY_RENDER}; 
+		RENDER_TYPE renderType; 
 		CameraObject* cameraObject; 
 		CameraControl* cameraControl; 
 		TextureVolumeObject* textureVolumeObject; 
@@ -47,4 +49,5 @@ class RenderViewport: public QOpenGLWidget
 		void ImportDicomFileSequence(QStringList fileNames);
 		void ImportTIFFFileSequence(QStringList fileNames);
 		void LoadLUT(float* buffer, int sizeLUT);
+		void ChooseRenderer(RENDER_TYPE rt);
 };
