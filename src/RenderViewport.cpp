@@ -64,6 +64,9 @@ void RenderViewport::initializeGL()
 	textureVolumeObject->SetVolumeTexture(textureVolume); 
 	textureVolumeObject->SetLUTTexture(textureLUT); 
 	
+	rayVolumeObject->SetVolumeTexture(textureVolume); 
+	rayVolumeObject->SetLUTTexture(textureLUT); 
+	
 	axisObject = new AxisObject();
 	AxisObject::InitSystem(); 
 	axisObject->Init();
@@ -91,6 +94,7 @@ void RenderViewport::paintGL()
 	
 	axisObject->Render(cameraObject->GetViewMatrix(), cameraObject->GetProjectionMatrix(windowWidth, windowHeight));
 	textureVolumeObject->Render(cameraObject->GetViewMatrix(), cameraObject->GetProjectionMatrix(windowWidth, windowHeight));
+	rayVolumeObject->Render(cameraObject->GetViewMatrix(), cameraObject->GetProjectionMatrix(windowWidth, windowHeight));
 	
 	PrintGLErrors();
 }

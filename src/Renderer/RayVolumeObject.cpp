@@ -1,18 +1,33 @@
 #include "RayVolumeObject.hpp"
 
 
+#include "Util.hpp"
+
+
 std::string RayVolumeObject::vertSrc= R"(
 #version 330
+
 //attribs
 layout(location = 0) in vec4 pointPosition;
+
 //transforms
 uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
+uniform mat4 projectionMatrix; 
+
 //outputs
+out vec3 rayOrig;
+out vec3 rayDir; 
+
 //main
 void main()
 {
+	//compute rays
+	vec4 frust = inverse(projectionMatrix) * pointPosition;
+	
 	//compute outputs
+	rayOrig = (inverse(viewMatrix) * vec4(0, 0, 0, 1)).xyz; 
+	rayDir = normalize(inverse(viewMatrix) * frust).xyz;
 	gl_Position = vec4(pointPosition.x, pointPosition.y, pointPosition.z, 1.0f);
 }
 )";
@@ -21,6 +36,8 @@ std::string RayVolumeObject::fragSrc = R"(
 #version 330
 
 //inputs
+in vec3 rayOrig;
+in vec3 rayDir;
 
 //uniforms
 uniform mat4 modelMatrix;
@@ -37,8 +54,7 @@ layout(location = 0) out vec4 outputColor;
 //main
 void main()
 {
-	vec3 rayOrig;
-	vec3 rayDir; 
+	
   	outputColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 }
 )";
@@ -120,7 +136,7 @@ void RayVolumeObject::Init()
 	v.w = 1.0;
 	
 	
-	double extent = 0.5; 
+	double extent = 1.0; 
 	
 	v.z = 0; 
 	v.x = -extent;
@@ -167,6 +183,8 @@ void RayVolumeObject::Render(glm::mat4 viewMatrix, glm::mat4 projectionMatrix)
 {
 	if(!visible) return; 
 	
+	std::cout << "RayVolumeObject: Rendering" << std::endl; 
+	
 	OPENGL_FUNC_MACRO
 	
 	//compute mvp matrix
@@ -175,7 +193,10 @@ void RayVolumeObject::Render(glm::mat4 viewMatrix, glm::mat4 projectionMatrix)
 	//bind shader
 	ogl->glUseProgram(programShaderObject);
 	
-	//update mv transform uniform in shader
+	//update mvp transform uniform in shader
+	int projectionMatrixLocation = ogl->glGetUniformLocation(programShaderObject, "projectionMatrix"); 
+	ogl->glUniformMatrix4fv(projectionMatrixLocation, 1, false, glm::value_ptr(projectionMatrix));
+	
 	int modelMatrixLocation = ogl->glGetUniformLocation(programShaderObject, "modelMatrix"); 
 	ogl->glUniformMatrix4fv(modelMatrixLocation, 1, false, glm::value_ptr(modelMatrix));
 	
@@ -199,6 +220,7 @@ void RayVolumeObject::Render(glm::mat4 viewMatrix, glm::mat4 projectionMatrix)
 		ogl->glBindTexture(GL_TEXTURE_3D, 0);
 	}
 	
+	
 	//update LUT texture
 	int lutTextureLocation = ogl->glGetUniformLocation(programShaderObject, "lutTexture"); 
 	ogl->glUniform1i(lutTextureLocation, 1);
@@ -213,24 +235,27 @@ void RayVolumeObject::Render(glm::mat4 viewMatrix, glm::mat4 projectionMatrix)
 		ogl->glBindTexture(GL_TEXTURE_1D, 0);
 	}
 	
+	
 	//update material uniforms
 	int materialAlphaLocation = ogl->glGetUniformLocation(programShaderObject, "brightness"); 
 	ogl->glUniform1f(materialAlphaLocation, brightness);
 	int materialPointSizeLocation = ogl->glGetUniformLocation(programShaderObject, "contrast"); 
 	ogl->glUniform1f(materialPointSizeLocation, contrast);
 	
+	
 	//bind VAO
 	ogl->glBindVertexArray(vertexArrayObject);
 	
 	//draw elements
-	//ogl->glDrawElements(GL_TRIANGLES, volumeSlices * 6, GL_UNSIGNED_INT, 0);
 	ogl->glDrawArrays(GL_TRIANGLES, 0, 6);
+	
 	
 	//unbind VAO
 	ogl->glBindVertexArray(0);
 	
 	//unbind shader program
 	ogl->glUseProgram(0);
+	
 
 }
 
