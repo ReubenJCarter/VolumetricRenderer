@@ -23,7 +23,9 @@ out vec3 rayDir;
 void main()
 {
 	//compute rays
-	vec4 frust = inverse(projectionMatrix) * pointPosition;
+	vec4 frust = inverse(projectionMatrix) * vec4(pointPosition.x, pointPosition.y, 1.0f, 1.0f);
+	frust.w = 0; 
+	frust = normalize(frust); 
 	
 	//compute outputs
 	rayOrig = (inverse(viewMatrix) * vec4(0, 0, 0, 1)).xyz; 
@@ -51,11 +53,60 @@ uniform sampler1D lutTexture;
 //output
 layout(location = 0) out vec4 outputColor; 
 
+//Ray intersects
+struct HitInfo
+{
+	bool hit; 
+	float dist; 
+};
+
+#define BIGNUM 1e10
+HitInfo RayAABBIntersect(vec3 rayOrig, vec3 rayDirInv, vec3 minaabb, vec3 maxaabb, float dist)
+{
+	HitInfo hitInfo;
+	vec3 t1 = (minaabb - rayOrig) * rayDirInv;
+	vec3 t2 = (maxaabb - rayOrig) * rayDirInv;
+	float tmin = max(max(min(t1.x, t2.x), min(t1.y, t2.y)), min(t1.z, t2.z));
+	float tmax = min(min(max(t1.x, t2.x), max(t1.y, t2.y)), max(t1.z, t2.z));
+	hitInfo.hit = tmax >= max(0.0f, tmin) && tmin < dist;
+	hitInfo.dist = tmin; 
+	return hitInfo;
+}
+
+//3d Volume Fetch
+vec4 Fetch3DVolume(vec3 position)
+{
+	float hasp = texDim.x / texDim.y;
+	float dasp = texDim.z / texDim.y;
+	return texture(volumeTexture, (position.xyz * vec3(1, 1, 1/dasp) + vec3(0.5f, 0.5f, 0.5f)));
+}
+
 //main
 void main()
 {
 	vec3 rayDirNorm = normalize(rayDir); 
-  	outputColor = vec4(rayDirNorm.x * 0.5f + 0.5f, 0.0f, rayDirNorm.y * 0.5f + 0.5f, 1.0f);
+	vec3 rayDirInv= vec3(1, 1, 1) / normalize(rayDirNorm); 
+	
+	HitInfo hi = RayAABBIntersect(rayOrig, rayDirInv, vec3(-0.5, -0.5, -0.5), vec3(0.5, 0.5, 0.5), BIGNUM);
+	
+	if(!hi.hit)
+		discard;
+	
+	float stepSize = 0.01f;
+	vec3 rayStart = rayOrig + rayDirNorm * (hi.dist + stepSize);
+	
+	vec4 finalColor = vec4(0, 0, 0, 0);
+	
+	for(int i = 0; i < 100; i++)
+	{
+		vec4 col = Fetch3DVolume(rayStart);
+		finalColor += texture(lutTexture, col.r);
+		rayStart += rayDirNorm * stepSize;
+	}
+	
+	
+	//outputColor = hi.hit ? vec4(1, 1, 1, 1) : vec4(0, 0, 0, 0);
+	outputColor = finalColor;
 }
 )";
  
