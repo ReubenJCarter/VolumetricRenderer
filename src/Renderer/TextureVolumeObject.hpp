@@ -47,7 +47,7 @@ class TextureVolumeObject: public Object3D
 	public:
 		static void InitSystem();
 		
-		TextureVolumeObject(unsigned int slices=128);
+		TextureVolumeObject(unsigned int slices=256);
 		virtual void Init();
 		virtual void Render(glm::mat4 viewMatrix, glm::mat4 projectionMatrix);
 		virtual void Destroy();

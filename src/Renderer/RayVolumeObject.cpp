@@ -54,8 +54,8 @@ layout(location = 0) out vec4 outputColor;
 //main
 void main()
 {
-	
-  	outputColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+	vec3 rayDirNorm = normalize(rayDir); 
+  	outputColor = vec4(rayDirNorm.x * 0.5f + 0.5f, 0.0f, rayDirNorm.y * 0.5f + 0.5f, 1.0f);
 }
 )";
  

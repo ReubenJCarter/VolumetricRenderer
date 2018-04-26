@@ -60,8 +60,9 @@ void main()
 	if(col.w <= 0.0001f)
 		discard; 
 	
+	vec4 finalColor = texture(lutTexture, col.r);
 	
-  	outputColor = texture(lutTexture, col.r);
+  	outputColor = finalColor;
 }
 )";
  
@@ -216,7 +217,8 @@ void TextureVolumeObject::Render(glm::mat4 viewMatrix, glm::mat4 projectionMatri
 	
 	//enable blending
 	ogl->glEnable(GL_BLEND);
-	ogl->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//ogl->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	ogl->glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA); 
 	//glBlendFunc(GL_ZERO, GL_SRC_COLOR);
 	//glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 	//glBlendFunc(GL_SRC_ALPHA, GL_ONE);

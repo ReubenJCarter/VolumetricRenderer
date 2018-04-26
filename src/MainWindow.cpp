@@ -56,6 +56,10 @@ MainWindow::MainWindow()
 		{
 			renderViewport.ChooseRenderer(RenderViewport::RAY_RENDER);
 		}
+		else if(text == QString("Cinematic"))
+		{
+			renderViewport.ChooseRenderer(RenderViewport::RAY_RENDER);
+		}
 		renderViewport.update();
 	});
 	
