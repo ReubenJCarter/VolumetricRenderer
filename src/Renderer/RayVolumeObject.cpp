@@ -105,7 +105,6 @@ void main()
 	}
 	
 	
-	//outputColor = hi.hit ? vec4(1, 1, 1, 1) : vec4(0, 0, 0, 0);
 	outputColor = finalColor;
 }
 )";

@@ -7,10 +7,10 @@
 class Texture3D
 {
 	protected:
-		unsigned int textureId; 
+		unsigned int textureId;
 		uint64_t width;
-		uint64_t height; 
-		uint64_t depth; 
+		uint64_t height;
+		uint64_t depth;
 		
 	public:
 		Texture3D();

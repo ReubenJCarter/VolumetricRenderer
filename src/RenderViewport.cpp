@@ -50,6 +50,8 @@ void RenderViewport::initializeGL()
 	
 	textureVolume = new Texture3D; 
 	
+	textureGradient = new Texture3D;
+	
 	textureLUT = new Texture1D;
 	
 	//Load Default LUT texture
@@ -162,12 +164,21 @@ void RenderViewport::ImportTIFFFileSequence(QStringList fileNames)
 	std::vector<std::string> files;
 	for(int i = 0; i < fileNames.size(); i++)
 		files.push_back(fileNames.at(i).toStdString());
+	
 	Image3D image3D;
 	bool loadGood = Image3DFromTIFFFileSequence(&image3D, files);
 	if(!loadGood)
 		return; 
+	
+	Image3D gradient3D;
+	gradient3D.Allocate(image3D.Width(), image3D.Height(), image3D.Depth(), 3);
+	gradient3D.Gradient(image3D);
+	
 	textureVolume->Allocate(image3D.Width(), image3D.Height(), image3D.Depth(), false);
 	textureVolume->LoadData(image3D.Data());
+	
+	//textureGradient->Allocate(gradient3D.Width(), gradient3D.Height(), gradient3D.Depth());
+	//textureGradient->LoadData(gradient3D.Data());
 	
 	update();
 }

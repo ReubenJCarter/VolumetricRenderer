@@ -38,6 +38,7 @@ class RenderViewport: public QOpenGLWidget
 		TextureVolumeObject* textureVolumeObject; 
 		RayVolumeObject* rayVolumeObject; 
 		Texture3D* textureVolume; 
+		Texture3D* textureGradient; 
 		Texture1D* textureLUT; 
 		AxisObject* axisObject;
 		
