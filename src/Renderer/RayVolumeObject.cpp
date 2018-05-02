@@ -324,6 +324,12 @@ void RayVolumeObject::SetVolumeTexture(Texture3D* vt)
 }
 
 
+void RayVolumeObject::SetGradientTexture(Texture3D* gt)
+{
+	gradientTexture = gt;
+}
+
+
 void RayVolumeObject::SetLUTTexture(Texture1D* lt)
 {
 	lutTexture = lt;

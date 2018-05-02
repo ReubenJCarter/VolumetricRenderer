@@ -312,6 +312,12 @@ void TextureVolumeObject::SetVolumeTexture(Texture3D* vt)
 }
 
 
+void TextureVolumeObject::SetGradientTexture(Texture3D* gt)
+{
+	gradientTexture = gt; 
+}
+
+
 void TextureVolumeObject::SetLUTTexture(Texture1D* lt)
 {
 	lutTexture = lt;

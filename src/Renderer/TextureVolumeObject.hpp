@@ -34,6 +34,7 @@ class TextureVolumeObject: public Object3D
 		Texture1D* lutTexture; 
 		
 		Texture3D* volumeTexture; 
+		Texture3D* gradientTexture; 
 		
 		unsigned int volumeSlices;
 		
@@ -53,5 +54,6 @@ class TextureVolumeObject: public Object3D
 		virtual void Destroy();
 		
 		void SetVolumeTexture(Texture3D* vt);
+		void SetGradientTexture(Texture3D* gt);
 		void SetLUTTexture(Texture1D* lt);
 };

@@ -67,9 +67,11 @@ void RenderViewport::initializeGL()
 	LoadLUT(&bufferLUT[0], sizeLUT);
 
 	textureVolumeObject->SetVolumeTexture(textureVolume); 
+	textureVolumeObject->SetGradientTexture(textureGradient); 
 	textureVolumeObject->SetLUTTexture(textureLUT); 
 	
 	rayVolumeObject->SetVolumeTexture(textureVolume); 
+	rayVolumeObject->SetGradientTexture(textureVolume); 
 	rayVolumeObject->SetLUTTexture(textureLUT); 
 	
 	axisObject = new AxisObject();
