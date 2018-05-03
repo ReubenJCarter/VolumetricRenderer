@@ -45,6 +45,7 @@ in vec3 rayDir;
 uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
 uniform sampler3D volumeTexture;
+uniform sampler3D gradientTexture;
 uniform vec3 texDim;
 uniform float brightness;
 uniform float contrast;
@@ -81,11 +82,19 @@ vec4 Fetch3DVolume(vec3 position)
 	return texture(volumeTexture, (position.xyz * vec3(1, 1, 1/dasp) + vec3(0.5f, 0.5f, 0.5f)));
 }
 
+vec3 FetchGradient(vec3 position)
+{
+	float hasp = texDim.x / texDim.y;
+	float dasp = texDim.z / texDim.y;
+	return texture(gradientTexture, (position.xyz * vec3(1, 1, 1/dasp) + vec3(0.5f, 0.5f, 0.5f))).xyz;
+}
+
 //main
 void main()
 {
 	vec3 rayDirNorm = normalize(rayDir); 
-	vec3 rayDirInv= vec3(1, 1, 1) / normalize(rayDirNorm); 
+	vec3 rayDirInv= vec3(1, 1, 1) / rayDirNorm; 
+	vec3 lightDir = vec3(0.707, 0.707, 0);
 	
 	HitInfo hi = RayAABBIntersect(rayOrig, rayDirInv, vec3(-0.5, -0.5, -0.5), vec3(0.5, 0.5, 0.5), BIGNUM);
 	
@@ -97,10 +106,16 @@ void main()
 	
 	vec4 finalColor = vec4(0, 0, 0, 0);
 	
+	
+	
 	for(int i = 0; i < 100; i++)
 	{
 		vec4 col = Fetch3DVolume(rayStart);
-		finalColor += texture(lutTexture, col.r);
+		vec3 gradient = FetchGradient(rayStart);
+		
+		float diffuse = max(0, dot(gradient, lightDir));
+		
+		finalColor += diffuse * texture(lutTexture, col.r);
 		rayStart += rayDirNorm * stepSize;
 	}
 	
@@ -260,8 +275,19 @@ void RayVolumeObject::Render(glm::mat4 viewMatrix, glm::mat4 projectionMatrix)
 	int volumeTextureLocation = ogl->glGetUniformLocation(programShaderObject, "volumeTexture"); 
 	ogl->glUniform1i(volumeTextureLocation, 0);
 	ogl->glActiveTexture(GL_TEXTURE0 + 0);
-	
 	if(volumeTexture != NULL)
+	{
+		ogl->glBindTexture(GL_TEXTURE_3D, volumeTexture->GetTextureId());
+	}
+	else
+	{
+		ogl->glBindTexture(GL_TEXTURE_3D, 0);
+	}
+	
+	int gradientTextureLocation = ogl->glGetUniformLocation(programShaderObject, "gradientTexture"); 
+	ogl->glUniform1i(gradientTextureLocation, 1);
+	ogl->glActiveTexture(GL_TEXTURE0 + 1);
+	if(gradientTexture != NULL)
 	{
 		ogl->glBindTexture(GL_TEXTURE_3D, volumeTexture->GetTextureId());
 	}

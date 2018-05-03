@@ -179,8 +179,8 @@ void RenderViewport::ImportTIFFFileSequence(QStringList fileNames)
 	textureVolume->Allocate(image3D.Width(), image3D.Height(), image3D.Depth(), false);
 	textureVolume->LoadData(image3D.Data());
 	
-	//textureGradient->Allocate(gradient3D.Width(), gradient3D.Height(), gradient3D.Depth());
-	//textureGradient->LoadData(gradient3D.Data());
+	textureGradient->Allocate(gradient3D.Width(), gradient3D.Height(), gradient3D.Depth(), false, 3);
+	textureGradient->LoadData(gradient3D.Data());
 	
 	update();
 }
