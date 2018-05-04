@@ -25,7 +25,7 @@ Texture3D::Texture3D()
 	channels = 4;
 }
 
-void Texture3D::Allocate(uint64_t w, uint64_t h, uint64_t d, bool compressed, int chan)
+void Texture3D::Allocate(uint64_t w, uint64_t h, uint64_t d, bool compressed, int chan, float border)
 {
 	width = w;
 	height = h;
@@ -36,7 +36,15 @@ void Texture3D::Allocate(uint64_t w, uint64_t h, uint64_t d, bool compressed, in
 
 	ogl->glBindTexture(GL_TEXTURE_3D, textureId);
 	
-	int internalFormats[] = {GL_COMPRESSED_RED, GL_COMPRESSED_RG, GL_COMPRESSED_RGB, GL_COMPRESSED_RGBA, GL_RED, GL_RG, GL_RGB, GL_RGBA}; 
+	ogl->glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	ogl->glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	ogl->glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	ogl->glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	ogl->glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
+	float bcolor[] = { border, border, border, border };
+	ogl->glTexParameterfv(GL_TEXTURE_3D, GL_TEXTURE_BORDER_COLOR, bcolor);
+	
+	int internalFormats[] = {GL_COMPRESSED_RED, GL_COMPRESSED_RG, GL_COMPRESSED_RGB, GL_COMPRESSED_RGBA, GL_R8, GL_RG8, GL_RGB8, GL_RGBA8}; 
 	int dataFormats[] = {GL_RED, GL_RG, GL_RGB, GL_RGBA}; 
 	
 	int internalFormat = compressed ? internalFormats[chan-1] : internalFormats[chan-1 + 4];	

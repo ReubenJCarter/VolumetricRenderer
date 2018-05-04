@@ -74,6 +74,34 @@ HitInfo RayAABBIntersect(vec3 rayOrig, vec3 rayDirInv, vec3 minaabb, vec3 maxaab
 	return hitInfo;
 }
 
+//Random
+uint Hash(uint x)
+{
+	x += (x << 10u);
+	x ^= (x >> 6u);
+	x += (x << 3u);
+	x ^= (x >> 11u);
+	x += (x << 15u);
+	return x;
+}
+
+uint Hash(uvec3 v)
+{
+	return Hash(v.x ^ Hash(v.y) ^ Hash(v.z));
+}
+
+float Random(vec2 f, float seed)
+{
+	const uint mantissaMask = 0x007FFFFFu;
+	const uint one = 0x3F800000u;
+	uint h = Hash(floatBitsToUint(vec3(f, seed)));
+	h &= mantissaMask;
+	h |= one;
+	float r2 = uintBitsToFloat(h);
+	return r2 - 1.0;
+}
+
+
 //3d Volume Fetch
 vec4 Fetch3DVolume(vec3 position)
 {
@@ -86,7 +114,7 @@ vec3 FetchGradient(vec3 position)
 {
 	float hasp = texDim.x / texDim.y;
 	float dasp = texDim.z / texDim.y;
-	return texture(gradientTexture, (position.xyz * vec3(1, 1, 1/dasp) + vec3(0.5f, 0.5f, 0.5f))).xyz;
+	return texture(gradientTexture, (position.xyz * vec3(1, 1, 1/dasp) + vec3(0.5f, 0.5f, 0.5f))).xyz - vec3(0.5f, 0.5f, 0.5f);
 }
 
 //main
@@ -94,28 +122,57 @@ void main()
 {
 	vec3 rayDirNorm = normalize(rayDir); 
 	vec3 rayDirInv= vec3(1, 1, 1) / rayDirNorm; 
-	vec3 lightDir = vec3(0.707, 0.707, 0);
+	vec3 lightDir0 = vec3(0.707f, -0.707f, 0);
+	vec3 lightDir1 = vec3(-0.707f, 0, 0.707f);
+	vec3 lightDir2 = vec3(0, 0.707f, -0.707f);
 	
 	HitInfo hi = RayAABBIntersect(rayOrig, rayDirInv, vec3(-0.5, -0.5, -0.5), vec3(0.5, 0.5, 0.5), BIGNUM);
 	
 	if(!hi.hit)
 		discard;
 	
-	float stepSize = 0.01f;
-	vec3 rayStart = rayOrig + rayDirNorm * (hi.dist + stepSize);
+	float stepSize = 0.002f;
+	vec3 rayStart = rayOrig + rayDirNorm * (hi.dist + stepSize + Random(gl_FragCoord.xy, 1234) * stepSize);
 	
 	vec4 finalColor = vec4(0, 0, 0, 0);
 	
 	
 	
-	for(int i = 0; i < 100; i++)
+	for(int i = 0; i < 500; i++)
 	{
 		vec4 col = Fetch3DVolume(rayStart);
 		vec3 gradient = FetchGradient(rayStart);
+		float gradientLen = length(gradient);
+		 		
+		float minGrad = 0.06f;
+		if(gradientLen > minGrad)
+		{
+			vec4 surface = texture(lutTexture, col.r);
+			vec3 surfacecol = surface.xyz; 
+			float surfaceopacity = surface.w;
+			
+			vec3 gradientNorm = normalize(gradient);
+			
+			float diffuse = 0.5 * max(0, dot(gradientNorm, lightDir0)) + 
+							0.5 * max(0, dot(gradientNorm, lightDir1)) +
+							0.2 * max(0, dot(gradientNorm, lightDir2));
+			float ambient = 0.2f;
+			
+			
+			vec3 reflection0 = 2 * max(0, dot(lightDir0, gradientNorm)) * gradientNorm - lightDir0; 
+			vec3 reflection1 = 2 * max(0, dot(lightDir1, gradientNorm)) * gradientNorm - lightDir1; 
+			vec3 reflection2 = 2 * max(0, dot(lightDir2, gradientNorm)) * gradientNorm - lightDir2; 
+			
+			float specular = 0.3 * pow(max(0, dot(reflection0, -rayDirNorm)), 30) + 
+							 0.3 * pow(max(0, dot(reflection1, -rayDirNorm)), 30) +
+							 0.3 * pow(max(0, dot(reflection2, -rayDirNorm)), 30);
+							 
+			vec3 phong  = ambient * surfacecol + diffuse * surfacecol + specular * vec3(1, 1, 1);
+			finalColor = vec4(phong.x, phong.y, phong.z, 1.0f);
+			break; 
+		}
+				
 		
-		float diffuse = max(0, dot(gradient, lightDir));
-		
-		finalColor += diffuse * texture(lutTexture, col.r);
 		rayStart += rayDirNorm * stepSize;
 	}
 	
@@ -269,7 +326,7 @@ void RayVolumeObject::Render(glm::mat4 viewMatrix, glm::mat4 projectionMatrix)
 	ogl->glUniformMatrix4fv(viewMatrixLocation, 1, false, glm::value_ptr(viewMatrix));
 	
 	
-	//update 3d texture
+	//update 3d texture volume
 	int texDimLocation = ogl->glGetUniformLocation(programShaderObject, "texDim"); 
 	ogl->glUniform3f(texDimLocation, (float)volumeTexture->Width(), (float)volumeTexture->Height(), (float)volumeTexture->Depth());
 	int volumeTextureLocation = ogl->glGetUniformLocation(programShaderObject, "volumeTexture"); 
@@ -284,23 +341,24 @@ void RayVolumeObject::Render(glm::mat4 viewMatrix, glm::mat4 projectionMatrix)
 		ogl->glBindTexture(GL_TEXTURE_3D, 0);
 	}
 	
+	//Update 3d texture gradient
 	int gradientTextureLocation = ogl->glGetUniformLocation(programShaderObject, "gradientTexture"); 
 	ogl->glUniform1i(gradientTextureLocation, 1);
 	ogl->glActiveTexture(GL_TEXTURE0 + 1);
 	if(gradientTexture != NULL)
 	{
-		ogl->glBindTexture(GL_TEXTURE_3D, volumeTexture->GetTextureId());
+		ogl->glBindTexture(GL_TEXTURE_3D, gradientTexture->GetTextureId());
 	}
 	else
 	{
 		ogl->glBindTexture(GL_TEXTURE_3D, 0);
+		std::cout << "RayVolumeObject:Render:gradient texture NULL" << std::endl; 
 	}
-	
 	
 	//update LUT texture
 	int lutTextureLocation = ogl->glGetUniformLocation(programShaderObject, "lutTexture"); 
-	ogl->glUniform1i(lutTextureLocation, 1);
-	ogl->glActiveTexture(GL_TEXTURE0 + 1);
+	ogl->glUniform1i(lutTextureLocation, 2);
+	ogl->glActiveTexture(GL_TEXTURE0 + 2);
 	
 	if(lutTexture != NULL)
 	{
@@ -310,6 +368,7 @@ void RayVolumeObject::Render(glm::mat4 viewMatrix, glm::mat4 projectionMatrix)
 	{
 		ogl->glBindTexture(GL_TEXTURE_1D, 0);
 	}
+	
 	
 	
 	//update material uniforms

@@ -71,7 +71,7 @@ void RenderViewport::initializeGL()
 	textureVolumeObject->SetLUTTexture(textureLUT); 
 	
 	rayVolumeObject->SetVolumeTexture(textureVolume); 
-	rayVolumeObject->SetGradientTexture(textureVolume); 
+	rayVolumeObject->SetGradientTexture(textureGradient); 
 	rayVolumeObject->SetLUTTexture(textureLUT); 
 	
 	axisObject = new AxisObject();
@@ -170,16 +170,20 @@ void RenderViewport::ImportTIFFFileSequence(QStringList fileNames)
 	Image3D image3D;
 	bool loadGood = Image3DFromTIFFFileSequence(&image3D, files);
 	if(!loadGood)
-		return; 
-	
-	Image3D gradient3D;
-	gradient3D.Allocate(image3D.Width(), image3D.Height(), image3D.Depth(), 3);
-	gradient3D.Gradient(image3D);
+		return;
 	
 	textureVolume->Allocate(image3D.Width(), image3D.Height(), image3D.Depth(), false);
 	textureVolume->LoadData(image3D.Data());
 	
-	textureGradient->Allocate(gradient3D.Width(), gradient3D.Height(), gradient3D.Depth(), false, 3);
+	
+	Image3D gradient3D;
+	gradient3D.Allocate(image3D.Width(), image3D.Height(), image3D.Depth(), 3);
+	//image3D.Smooth(); 
+	image3D.Median();
+	
+	gradient3D.Gradient(image3D);
+	
+	textureGradient->Allocate(gradient3D.Width(), gradient3D.Height(), gradient3D.Depth(), false, 3, 0.5);
 	textureGradient->LoadData(gradient3D.Data());
 	
 	update();
