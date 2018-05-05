@@ -31,3 +31,8 @@ target_link_libraries(VolumetricRenderer Qt5::Core Qt5::Widgets Qt5::OpenGL)
 target_link_libraries(VolumetricRenderer dcmdata dcmimgle dcmimage )
 
 target_link_libraries(VolumetricRenderer tiff)
+
+install(TARGETS VolumetricRenderer
+		RUNTIME
+		DESTINATION bin
+		COMPONENT MainApplication)	

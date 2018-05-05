@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.0.0)
 project(VolumetricRenderer)
 set(PROJECT_BRIEF "VolumetricRenderer")
 
+set(SoftwareVersion 0.1)
+add_definitions(-DSOFTWAREVERSION=${SoftwareVersion})
+
 set(CMAKE_AUTOMOC ON)
 
 set(CMAKE_BUILD_TYPE RELEASE)
@@ -39,3 +42,61 @@ link_directories(${LIBTIFF_LIB_DIR})
 
 include_directories(src)
 add_subdirectory(src)
+
+
+
+#installer stuff
+set(QT_BIN_DIR "C:/Qt/5.10.1/msvc2015_64/bin")
+install(FILES ${QT_BIN_DIR}/Qt5Core.dll
+			  ${QT_BIN_DIR}/Qt5Gui.dll
+			  ${QT_BIN_DIR}/Qt5Widgets.dll
+			  ${QT_BIN_DIR}/Qt5Charts.dll
+			  ${QT_BIN_DIR}/Qt5OpenGL.dll
+			  ${QT_BIN_DIR}/Qt5Concurrent.dll
+			  ${QT_BIN_DIR}/../plugins/platforms/qwindows.dll
+			  ${LIBTIFF_BIN_DIR}/tiff.dll
+			  ${LIBTIFF_BIN_DIR}/tiffxx.dll
+			  ${DCMTK_BIN_DIR}/dcmdata.dll
+			  ${DCMTK_BIN_DIR}/dcmdsig.dll
+			  ${DCMTK_BIN_DIR}/dcmfg.dll
+			  ${DCMTK_BIN_DIR}/dcmimage.dll
+			  ${DCMTK_BIN_DIR}/dcmimgle.dll
+			  ${DCMTK_BIN_DIR}/dcmiod.dll
+			  ${DCMTK_BIN_DIR}/dcmjpeg.dll
+			  ${DCMTK_BIN_DIR}/dcmjpls.dll
+			  ${DCMTK_BIN_DIR}/dcmnet.dll
+			  ${DCMTK_BIN_DIR}/dcmpmap.dll
+			  ${DCMTK_BIN_DIR}/dcmpstat.dll
+			  ${DCMTK_BIN_DIR}/dcmqrdb.dll
+			  ${DCMTK_BIN_DIR}/dcmrt.dll
+			  ${DCMTK_BIN_DIR}/dcmseg.dll
+			  ${DCMTK_BIN_DIR}/dcmsr.dll
+			  ${DCMTK_BIN_DIR}/dcmtls.dll
+			  ${DCMTK_BIN_DIR}/dcmtract.dll
+			  ${DCMTK_BIN_DIR}/dcmwlm.dll
+			  ${DCMTK_BIN_DIR}/i2d.dll
+			  ${DCMTK_BIN_DIR}/ijg8.dll
+			  ${DCMTK_BIN_DIR}/ijg12.dll
+			  ${DCMTK_BIN_DIR}/ijg16.dll
+			  ${DCMTK_BIN_DIR}/oflog.dll
+			  ${DCMTK_BIN_DIR}/ofstd.dll
+			  
+		DESTINATION bin
+		COMPONENT MainApplication
+)
+
+set(CPACK_PACKAGE_NAME "VolumetricRenderer")
+set(CPACK_PACKAGE_VENDOR "CMake.org")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "VolumetricRenderer - Install For Maximum Fun")
+set(CPACK_PACKAGE_VERSION ${SoftwareVersion})
+set(CPACK_PACKAGE_INSTALL_DIRECTORY "VolumetricRenderer")
+#set(CPACK_RESOURCE_FILE_LICENSE ${CMAKE_CURRENT_SOURCE_DIR}/licence.txt)
+
+set(CPACK_COMPONENTS_ALL MainApplication)
+
+set(CPACK_PACKAGE_EXECUTABLES "VolumetricRenderer;VolumetricRenderer")
+
+set(CPACK_CREATE_DESKTOP_LINKS "VolumetricRenderer")
+
+
+include(CPack)
