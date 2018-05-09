@@ -60,7 +60,6 @@ MainWindow::MainWindow()
 		{
 			renderViewport.ChooseRenderer(RenderViewport::RAY_RENDER);
 		}
-		renderViewport.update();
 	});
 	
 	QObject::connect(controlPanel.imageSettings->sampleMapping, &SampleMappingEditor::CurveChanged, [this]()
@@ -70,6 +69,17 @@ MainWindow::MainWindow()
 		controlPanel.imageSettings->sampleMapping->GetLUT(sizeLUT, &bufferLUT[0]);
 		renderViewport.LoadLUT(&bufferLUT[0], sizeLUT);
 		
+	});
+	
+	QObject::connect(controlPanel.imageSettings->chooserGradientThreshold, &ScalarChooser::valueChanged, [this](float value)
+	{
+		renderViewport.SetGradientThreshold(value);
+	});
+	
+	QObject::connect(controlPanel.imageSettings->checkBackFaceCulling, &QCheckBox::stateChanged, [this](int state)
+	{
+		bool value = state == Qt::Checked; 
+		renderViewport.SetBackFaceCulling(value);
 	});
 	
 	//central

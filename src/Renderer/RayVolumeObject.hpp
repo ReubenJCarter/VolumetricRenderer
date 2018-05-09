@@ -43,6 +43,9 @@ class RayVolumeObject: public Object3D
 		
 		float brightness;
 		float contrast;
+		float gradientThreshold;
+		bool backFaceCulling; 
+		
 	
 	public:
 		static void InitSystem();
@@ -55,4 +58,6 @@ class RayVolumeObject: public Object3D
 		void SetVolumeTexture(Texture3D* vt);
 		void SetGradientTexture(Texture3D* gt);
 		void SetLUTTexture(Texture1D* lt);
+		void SetGradientThreshold(float gt);
+		void SetBackFaceCulling(bool cull);
 };

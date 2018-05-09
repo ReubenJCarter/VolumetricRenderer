@@ -30,4 +30,10 @@ ImageSettings::ImageSettings()
 		sampleMapping->show();
 	});
 	
+	chooserGradientThreshold = new ScalarChooser("Gradient Threshold", 0, 0.25, 0.05);
+	layoutGroup->addWidget(chooserGradientThreshold);
+	
+	checkBackFaceCulling = new QCheckBox(""); 
+	layoutGroup->addWidget(new QLabel("Back Face Culling"));
+	layoutGroup->addWidget(checkBackFaceCulling);
 }

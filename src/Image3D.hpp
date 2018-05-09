@@ -24,7 +24,9 @@ class Image3D
 		uint64_t Height();
 		uint64_t Depth();
 		uint64_t ByteSize();
+		void Smooth2D();
+		void Median2D();
 		void Smooth();
 		void Median();
-		void Gradient(Image3D& inImg);
+		void Gradient(Image3D& inImg, bool nonMaxSup=false);
 };

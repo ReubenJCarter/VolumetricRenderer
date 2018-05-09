@@ -49,6 +49,8 @@ uniform sampler3D gradientTexture;
 uniform vec3 texDim;
 uniform float brightness;
 uniform float contrast;
+uniform float gradientThreshold;
+uniform int backFaceCulling; 
 uniform sampler1D lutTexture;
 
 //output
@@ -144,32 +146,35 @@ void main()
 		vec3 gradient = FetchGradient(rayStart);
 		float gradientLen = length(gradient);
 		 		
-		float minGrad = 0.06f;
-		if(gradientLen > minGrad)
+		if(gradientLen > gradientThreshold)
 		{
-			vec4 surface = texture(lutTexture, col.r);
-			vec3 surfacecol = surface.xyz; 
-			float surfaceopacity = surface.w;
-			
 			vec3 gradientNorm = normalize(gradient);
-			
-			float diffuse = 0.5 * max(0, dot(gradientNorm, lightDir0)) + 
-							0.5 * max(0, dot(gradientNorm, lightDir1)) +
-							0.2 * max(0, dot(gradientNorm, lightDir2));
-			float ambient = 0.2f;
-			
-			
-			vec3 reflection0 = 2 * max(0, dot(lightDir0, gradientNorm)) * gradientNorm - lightDir0; 
-			vec3 reflection1 = 2 * max(0, dot(lightDir1, gradientNorm)) * gradientNorm - lightDir1; 
-			vec3 reflection2 = 2 * max(0, dot(lightDir2, gradientNorm)) * gradientNorm - lightDir2; 
-			
-			float specular = 0.3 * pow(max(0, dot(reflection0, -rayDirNorm)), 30) + 
-							 0.3 * pow(max(0, dot(reflection1, -rayDirNorm)), 30) +
-							 0.3 * pow(max(0, dot(reflection2, -rayDirNorm)), 30);
-							 
-			vec3 phong  = ambient * surfacecol + diffuse * surfacecol + specular * vec3(1, 1, 1);
-			finalColor = vec4(phong.x, phong.y, phong.z, 1.0f);
-			break; 
+			if(dot(-rayDirNorm, gradientNorm) > 0 || !backFaceCulling)
+			{
+				vec4 surface = texture(lutTexture, col.r);
+				vec3 surfacecol = surface.xyz; 
+				float surfaceopacity = surface.w;
+				
+				
+				
+				float diffuse = 0.5 * max(0, dot(gradientNorm, lightDir0)) + 
+								0.5 * max(0, dot(gradientNorm, lightDir1)) +
+								0.2 * max(0, dot(gradientNorm, lightDir2));
+				float ambient = 0.2f;
+				
+				
+				vec3 reflection0 = 2 * max(0, dot(lightDir0, gradientNorm)) * gradientNorm - lightDir0; 
+				vec3 reflection1 = 2 * max(0, dot(lightDir1, gradientNorm)) * gradientNorm - lightDir1; 
+				vec3 reflection2 = 2 * max(0, dot(lightDir2, gradientNorm)) * gradientNorm - lightDir2; 
+				
+				float specular = 0.3 * pow(max(0, dot(reflection0, -rayDirNorm)), 30) + 
+								 0.3 * pow(max(0, dot(reflection1, -rayDirNorm)), 30) +
+								 0.3 * pow(max(0, dot(reflection2, -rayDirNorm)), 30);
+								 
+				vec3 phong  = ambient * surfacecol + diffuse * surfacecol + specular * vec3(1, 1, 1);
+				finalColor = vec4(phong.x, phong.y, phong.z, 1.0f);
+				break; 
+			}
 		}
 				
 		
@@ -237,6 +242,8 @@ RayVolumeObject::RayVolumeObject()
 {
 	brightness = 0;
 	contrast = 1;
+	gradientThreshold = 0.06;
+	backFaceCulling = true; 
 }
 
 
@@ -376,7 +383,10 @@ void RayVolumeObject::Render(glm::mat4 viewMatrix, glm::mat4 projectionMatrix)
 	ogl->glUniform1f(materialAlphaLocation, brightness);
 	int materialPointSizeLocation = ogl->glGetUniformLocation(programShaderObject, "contrast"); 
 	ogl->glUniform1f(materialPointSizeLocation, contrast);
-	
+	int materialGradientThresholdLocation = ogl->glGetUniformLocation(programShaderObject, "gradientThreshold"); 
+	ogl->glUniform1f(materialGradientThresholdLocation, gradientThreshold);
+	int materialBackFaceCullingLocation = ogl->glGetUniformLocation(programShaderObject, "backFaceCulling"); 
+	ogl->glUniform1i(materialBackFaceCullingLocation, (int)backFaceCulling);
 	
 	//bind VAO
 	ogl->glBindVertexArray(vertexArrayObject);
@@ -418,4 +428,14 @@ void RayVolumeObject::SetGradientTexture(Texture3D* gt)
 void RayVolumeObject::SetLUTTexture(Texture1D* lt)
 {
 	lutTexture = lt;
+}
+
+void RayVolumeObject::SetGradientThreshold(float gt)
+{
+	gradientThreshold = gt;
+}
+
+void RayVolumeObject::SetBackFaceCulling(bool cull)
+{
+	backFaceCulling = cull;
 }

@@ -211,4 +211,17 @@ void RenderViewport::ChooseRenderer(RENDER_TYPE rt)
 		textureVolumeObject->SetVisible(false); 
 		rayVolumeObject->SetVisible(true); 
 	}
+	update();
+}
+
+void RenderViewport::SetGradientThreshold(float threshold)
+{
+	rayVolumeObject->SetGradientThreshold(threshold);
+	update();
+}
+
+void RenderViewport::SetBackFaceCulling(bool cull)
+{
+	rayVolumeObject->SetBackFaceCulling(cull);
+	update();
 }

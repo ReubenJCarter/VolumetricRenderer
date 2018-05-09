@@ -80,6 +80,7 @@ ScalarChooser::ScalarChooser(QString name, double minv, double maxv, double star
 	spin->setMinimum(minv);
 	spin->setSingleStep(sliderStep);
 	spin->setValue(start);
+	spin->setDecimals(4);
 	
 	slider->setMinimum(0);
 	slider->setMaximum(100);

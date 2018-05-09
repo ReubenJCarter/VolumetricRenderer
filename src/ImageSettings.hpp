@@ -20,6 +20,8 @@ class ImageSettings: public QWidget
 		Vector3Chooser* chooserScale;
 		QPushButton* buttonSampleMapping; 
 		SampleMappingEditor* sampleMapping;
+		ScalarChooser* chooserGradientThreshold;
+		QCheckBox* checkBackFaceCulling; 
 	
 		ImageSettings();
 

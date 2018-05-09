@@ -51,4 +51,6 @@ class RenderViewport: public QOpenGLWidget
 		void ImportTIFFFileSequence(QStringList fileNames);
 		void LoadLUT(float* buffer, int sizeLUT);
 		void ChooseRenderer(RENDER_TYPE rt);
+		void SetGradientThreshold(float threshold);
+		void SetBackFaceCulling(bool cull); 
 };
