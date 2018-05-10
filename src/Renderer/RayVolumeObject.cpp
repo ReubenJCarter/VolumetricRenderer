@@ -149,7 +149,7 @@ void main()
 		if(gradientLen > gradientThreshold)
 		{
 			vec3 gradientNorm = normalize(gradient);
-			if(dot(-rayDirNorm, gradientNorm) > 0 || !backFaceCulling)
+			if(dot(-rayDirNorm, gradientNorm) > 0 || !bool(backFaceCulling))
 			{
 				vec4 surface = texture(lutTexture, col.r);
 				vec3 surfacecol = surface.xyz; 
