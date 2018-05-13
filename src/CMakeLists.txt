@@ -16,6 +16,7 @@ set (volumetricRendererSrc
 		Renderer/Object3D.cpp
 		Renderer/TextureVolumeObject.cpp
 		Renderer/RayVolumeObject.cpp
+		Renderer/PhotonVolumeObject.cpp
 		Renderer/CameraObject.cpp
 		Renderer/CameraControl.cpp
 		Renderer/AxisObject.cpp

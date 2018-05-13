@@ -6,6 +6,7 @@
 #include "Renderer/CameraObject.hpp"
 #include "Renderer/TextureVolumeObject.hpp"
 #include "Renderer/RayVolumeObject.hpp"
+#include "Renderer/PhotonVolumeObject.hpp"
 #include "Renderer/Texture3D.hpp"
 #include "Renderer/Texture1D.hpp"
 #include "Renderer/CameraControl.hpp"
@@ -31,12 +32,13 @@ class RenderViewport: public QOpenGLWidget
 		void keyReleaseEvent(QKeyEvent *event);
 		
 	public:
-		enum RENDER_TYPE{SLICE_RENDER, RAY_RENDER}; 
+		enum RENDER_TYPE{SLICE_RENDER, RAY_RENDER, PHOTON_RENDER}; 
 		RENDER_TYPE renderType; 
 		CameraObject* cameraObject; 
 		CameraControl* cameraControl; 
 		TextureVolumeObject* textureVolumeObject; 
 		RayVolumeObject* rayVolumeObject; 
+		PhotonVolumeObject* photonVolumeObject;
 		Texture3D* textureVolume; 
 		Texture3D* textureGradient; 
 		Texture1D* textureLUT; 

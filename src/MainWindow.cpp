@@ -56,9 +56,9 @@ MainWindow::MainWindow()
 		{
 			renderViewport.ChooseRenderer(RenderViewport::RAY_RENDER);
 		}
-		else if(text == QString("Cinematic"))
+		else if(text == QString("Photon"))
 		{
-			renderViewport.ChooseRenderer(RenderViewport::RAY_RENDER);
+			renderViewport.ChooseRenderer(RenderViewport::PHOTON_RENDER);
 		}
 	});
 	

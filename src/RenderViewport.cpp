@@ -45,8 +45,13 @@ void RenderViewport::initializeGL()
 	rayVolumeObject = new RayVolumeObject;
 	rayVolumeObject->Init();
 	
+	PhotonVolumeObject::InitSystem();
+	photonVolumeObject = new PhotonVolumeObject;
+	photonVolumeObject->Init();
+	
 	textureVolumeObject->SetVisible(true); 
 	rayVolumeObject->SetVisible(false); 
+	photonVolumeObject->SetVisible(false); 
 	
 	textureVolume = new Texture3D; 
 	
@@ -73,6 +78,10 @@ void RenderViewport::initializeGL()
 	rayVolumeObject->SetVolumeTexture(textureVolume); 
 	rayVolumeObject->SetGradientTexture(textureGradient); 
 	rayVolumeObject->SetLUTTexture(textureLUT); 
+	
+	photonVolumeObject->SetVolumeTexture(textureVolume); 
+	photonVolumeObject->SetGradientTexture(textureGradient); 
+	photonVolumeObject->SetLUTTexture(textureLUT); 
 	
 	axisObject = new AxisObject();
 	AxisObject::InitSystem(); 
@@ -102,6 +111,7 @@ void RenderViewport::paintGL()
 	axisObject->Render(cameraObject->GetViewMatrix(), cameraObject->GetProjectionMatrix(windowWidth, windowHeight));
 	textureVolumeObject->Render(cameraObject->GetViewMatrix(), cameraObject->GetProjectionMatrix(windowWidth, windowHeight));
 	rayVolumeObject->Render(cameraObject->GetViewMatrix(), cameraObject->GetProjectionMatrix(windowWidth, windowHeight));
+	photonVolumeObject->Render(cameraObject->GetViewMatrix(), cameraObject->GetProjectionMatrix(windowWidth, windowHeight));
 	
 	PrintGLErrors();
 }
@@ -180,6 +190,7 @@ void RenderViewport::ImportTIFFFileSequence(QStringList fileNames)
 	gradient3D.Allocate(image3D.Width(), image3D.Height(), image3D.Depth(), 3);
 	//image3D.Smooth(); 
 	image3D.Median();
+	//image3D.Median2D();
 	
 	gradient3D.Gradient(image3D);
 	
@@ -205,11 +216,19 @@ void RenderViewport::ChooseRenderer(RENDER_TYPE rt)
 	{
 		textureVolumeObject->SetVisible(true); 
 		rayVolumeObject->SetVisible(false); 
+		photonVolumeObject->SetVisible(false); 
 	}
 	else if(renderType == RAY_RENDER)
 	{
 		textureVolumeObject->SetVisible(false); 
 		rayVolumeObject->SetVisible(true); 
+		photonVolumeObject->SetVisible(false); 
+	}
+	else if(renderType == PHOTON_RENDER)
+	{
+		textureVolumeObject->SetVisible(false); 
+		rayVolumeObject->SetVisible(false); 
+		photonVolumeObject->SetVisible(true); 
 	}
 	update();
 }
@@ -217,11 +236,13 @@ void RenderViewport::ChooseRenderer(RENDER_TYPE rt)
 void RenderViewport::SetGradientThreshold(float threshold)
 {
 	rayVolumeObject->SetGradientThreshold(threshold);
+	photonVolumeObject->SetGradientThreshold(threshold);
 	update();
 }
 
 void RenderViewport::SetBackFaceCulling(bool cull)
 {
 	rayVolumeObject->SetBackFaceCulling(cull);
+	photonVolumeObject->SetBackFaceCulling(cull);
 	update();
 }

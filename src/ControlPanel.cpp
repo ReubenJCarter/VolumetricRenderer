@@ -22,7 +22,7 @@ ControlPanel::ControlPanel(): QDockWidget("Control Panel")
 	comboRenderer = new QComboBox();
 	comboRenderer->addItem("Slice");
 	comboRenderer->addItem("Ray");
-	comboRenderer->addItem("Cinematic");
+	comboRenderer->addItem("Photon");
 	layoutBase->addWidget(comboRenderer);
 	
 	imageSettings = new ImageSettings();
