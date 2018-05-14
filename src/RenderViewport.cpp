@@ -192,7 +192,8 @@ void RenderViewport::ImportTIFFFileSequence(QStringList fileNames)
 	image3D.Median();
 	//image3D.Median2D();
 	
-	gradient3D.Gradient(image3D);
+	//gradient3D.CentralDifference(image3D);
+	gradient3D.Sobel(image3D);
 	
 	textureGradient->Allocate(gradient3D.Width(), gradient3D.Height(), gradient3D.Depth(), false, 3, 0.5);
 	textureGradient->LoadData(gradient3D.Data());

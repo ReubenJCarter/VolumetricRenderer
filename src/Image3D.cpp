@@ -270,7 +270,7 @@ void Image3D::Median()
 	}
 }
 
-void Image3D::Gradient(Image3D& inImg, bool nonMaxSup)
+void Image3D::CentralDifference(Image3D& inImg)
 {
 	for(uint64_t z = 0; z < depth; z++)
 	{
@@ -320,16 +320,20 @@ void Image3D::Gradient(Image3D& inImg, bool nonMaxSup)
 		}
 	}
 	
+}
+
+void Image3D::Sobel(Image3D& inImg)
+{
+	unsigned char* d = (unsigned char*)inImg.data;
 	
-	if(!nonMaxSup)
-		return;
-	
+	std::vector<int> vals(27); 
 	for(uint64_t z = 0; z < depth; z++)
 	{
 		for(uint64_t y = 0; y < height; y++)
 		{
 			for(uint64_t x = 0; x < width; x++)
 			{
+				
 				int64_t x0 = x+1;
 				int64_t x1 = x-1;
 				int64_t y0 = y+1;
@@ -337,14 +341,89 @@ void Image3D::Gradient(Image3D& inImg, bool nonMaxSup)
 				int64_t z0 = z+1;
 				int64_t z1 = z-1;
 				
+				
 				if(x0 < 0 || x0 >= width) x0 = x;
 				if(x1 < 0 || x1 >= width) x1 = x;
 				if(y0 < 0 || y0 >= height) y0 = y;
 				if(y1 < 0 || y1 >= height) y1 = y;
 				if(z0 < 0 || z0 >= depth) z0 = z;
 				if(z1 < 0 || z1 >= depth) z1 = z;
+					
+					
+				
+					
+				//xy plane				z0
+				vals[0] = d[(z0 * width * height + y0 * width + x0) * inImg.pixelSize];
+				vals[1] = d[(z0 * width * height + y0 * width + x) * inImg.pixelSize];
+				vals[2] = d[(z0 * width * height + y0 * width + x1) * inImg.pixelSize];
+				vals[3] = d[(z0 * width * height + y * width + x0) * inImg.pixelSize];
+				vals[4] = d[(z0 * width * height + y * width + x) * inImg.pixelSize];
+				vals[5] = d[(z0 * width * height + y * width + x1) * inImg.pixelSize];
+				vals[6] = d[(z0 * width * height + y1 * width + x0) * inImg.pixelSize];
+				vals[7] = d[(z0 * width * height + y1 * width + x) * inImg.pixelSize];
+				vals[8] = d[(z0 * width * height + y1 * width + x1) * inImg.pixelSize];
+				
+				//xy plane     z1
+				vals[9] = d[(z * width * height + y0 * width + x0) * inImg.pixelSize];
+				vals[10] = d[(z * width * height + y0 * width + x) * inImg.pixelSize];
+				vals[11] = d[(z * width * height + y0 * width + x1) * inImg.pixelSize];
+				vals[12] = d[(z * width * height + y * width + x0) * inImg.pixelSize];
+				vals[13] = d[(z * width * height + y * width + x) * inImg.pixelSize];
+				vals[14] = d[(z * width * height + y * width + x1) * inImg.pixelSize];
+				vals[15] = d[(z * width * height + y1 * width + x0) * inImg.pixelSize];
+				vals[16] = d[(z * width * height + y1 * width + x) * inImg.pixelSize];
+				vals[17] = d[(z * width * height + y1 * width + x1) * inImg.pixelSize];
+				
+				//xy plane     z2
+				vals[18] = d[(z1 * width * height + y0 * width + x0) * inImg.pixelSize];
+				vals[19] = d[(z1 * width * height + y0 * width + x) * inImg.pixelSize];
+				vals[20] = d[(z1 * width * height + y0 * width + x1) * inImg.pixelSize];
+				vals[21] = d[(z1 * width * height + y * width + x0) * inImg.pixelSize];
+				vals[22] = d[(z1 * width * height + y * width + x) * inImg.pixelSize];
+				vals[23] = d[(z1 * width * height + y * width + x1) * inImg.pixelSize];
+				vals[24] = d[(z1 * width * height + y1 * width + x0) * inImg.pixelSize];
+				vals[25] = d[(z1 * width * height + y1 * width + x) * inImg.pixelSize];
+				vals[26] = d[(z1 * width * height + y1 * width + x1) * inImg.pixelSize];
 				
 				
+				
+				double gradZ =(vals[0] * -1.0 + vals[1] * -3.0 + vals[2] * -1.0 +  
+							   vals[3] * -3.0 + vals[4] * -6.0 + vals[5] * -3.0 +  
+							   vals[6] * -1.0 + vals[7] * -3.0 + vals[8] * -1.0 + 
+							   
+							   vals[18] * 1.0 + vals[19] * 3.0 + vals[20] * 1.0 +  
+							   vals[21] * 3.0 + vals[22] * 6.0 + vals[23] * 3.0 +  
+							   vals[24] * 1.0 + vals[25] * 3.0 + vals[26] * 1.0)/22.0;
+							   
+							   
+				double gradY =(vals[0] * -1.0 + vals[1] * -3.0 + vals[2] * -1.0 + 
+							   vals[3] * 0    + vals[4] * 0    + vals[5] * 0 + 
+							   vals[6] * 1.0  + vals[7] * 3.0  + vals[8] * 1.0 + 
+							   
+							   vals[9] * -3.0 + vals[10] * -6.0 + vals[11] * -3.0 + 
+							   vals[12] * 0   + vals[13] * 0    + vals[14] * 0 + 
+							   vals[15] * 3.0 + vals[16] * 6.0  + vals[17] * 3.0 + 
+							   
+							   vals[18] * -1.0 + vals[19] * -3.0 + vals[20] * -1.0 + 
+							   vals[21] * 0    + vals[22] * 0    + vals[23] * 0 + 
+							   vals[24] * 1.0  + vals[25] * 3.0  + vals[26] * 1.0)/22.0;
+							   
+				double gradX = (vals[0] * -1.0 + vals[1] * 0 + vals[2] * 1.0 + 
+							   vals[3] * -3.0  + vals[4] * 0 + vals[5] * 3.0 + 
+							   vals[6] * -1.0  + vals[7] * 0 + vals[8] * 1.0 + 
+							   
+							   vals[9] *  -3.0 + vals[10] * 0 + vals[11] * 3.0 + 
+							   vals[12] * -6.0 + vals[13] * 0 + vals[14] * 6.0 + 
+							   vals[15] * -3.0 + vals[16] * 0 + vals[17] * 3.0 + 
+							   
+							   vals[18] * -1.0 + vals[19] * 0 + vals[20] * 1.0 + 
+							   vals[21] * -3.0 + vals[22] * 0 + vals[23] * 3.0 + 
+							   vals[24] * -1.0 + vals[25] * 0 + vals[26] * 1.0)/22.0;
+				
+				
+				((unsigned char*)data)[(z * width * height + y * width + x) * pixelSize + 0] = ((int)gradX + 255) / 2;
+				((unsigned char*)data)[(z * width * height + y * width + x) * pixelSize + 1] = ((int)gradY + 255) / 2;
+				((unsigned char*)data)[(z * width * height + y * width + x) * pixelSize + 2] = ((int)gradZ + 255) / 2;
 			}
 		}
 	}

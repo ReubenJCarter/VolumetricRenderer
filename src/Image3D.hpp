@@ -28,5 +28,6 @@ class Image3D
 		void Median2D();
 		void Smooth();
 		void Median();
-		void Gradient(Image3D& inImg, bool nonMaxSup=false);
+		void CentralDifference(Image3D& inImg);
+		void Sobel(Image3D& inImg);
 };
