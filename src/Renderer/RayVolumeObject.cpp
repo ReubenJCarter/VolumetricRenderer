@@ -142,7 +142,6 @@ void main()
 	
 	for(int i = 0; i < 500; i++)
 	{
-		vec4 col = Fetch3DVolume(rayStart);
 		vec3 gradient = FetchGradient(rayStart);
 		float gradientLen = length(gradient);
 		 		
@@ -151,6 +150,7 @@ void main()
 			vec3 gradientNorm = normalize(gradient);
 			if(dot(-rayDirNorm, gradientNorm) > 0 || !bool(backFaceCulling))
 			{
+				vec4 col = Fetch3DVolume(rayStart + -gradientNorm * stepSize * 3);
 				vec4 surface = texture(lutTexture, col.r);
 				vec3 surfacecol = surface.xyz; 
 				float surfaceopacity = surface.w;
