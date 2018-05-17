@@ -30,4 +30,5 @@ class Image3D
 		void Median();
 		void CentralDifference(Image3D& inImg);
 		void Sobel(Image3D& inImg);
+		void Normalize();
 };

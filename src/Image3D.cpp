@@ -428,3 +428,50 @@ void Image3D::Sobel(Image3D& inImg)
 		}
 	}
 }
+
+void Image3D::Normalize()
+{
+	unsigned char minD = 255;
+	unsigned char maxD = 0; 
+	
+	for(uint64_t z = 0; z < depth; z++)
+	{
+		for(uint64_t y = 0; y < height; y++)
+		{
+			for(uint64_t x = 0; x < width; x++)
+			{
+				
+				unsigned char* indata = (unsigned char*)Data();
+				
+				unsigned char d = indata[(z * width * height + y * width + x) * pixelSize];
+				
+				if(d < minD )
+					minD = d;
+				
+				if(d > maxD)
+					maxD = d; 
+			
+			}
+		}
+	}
+	
+	
+	double scaleFactor = 255.0 / (double)(maxD - minD); 
+	for(uint64_t z = 0; z < depth; z++)
+	{
+		for(uint64_t y = 0; y < height; y++)
+		{
+			for(uint64_t x = 0; x < width; x++)
+			{
+				unsigned char* indata = (unsigned char*)Data();
+				
+				unsigned char d = indata[(z * width * height + y * width + x) * pixelSize];
+				
+				((unsigned char*)data)[(z * width * height + y * width + x) * pixelSize + 0] = (d - minD) * scaleFactor;
+				((unsigned char*)data)[(z * width * height + y * width + x) * pixelSize + 1] = (d - minD) * scaleFactor;
+				((unsigned char*)data)[(z * width * height + y * width + x) * pixelSize + 2] = (d - minD) * scaleFactor;
+				((unsigned char*)data)[(z * width * height + y * width + x) * pixelSize + 3] = (d - minD) * scaleFactor;
+			}
+		}
+	}
+}

@@ -252,6 +252,14 @@ void TextureVolumeObject::Render(glm::mat4 viewMatrix, glm::mat4 projectionMatri
 	if(volumeTexture != NULL)
 	{
 		ogl->glBindTexture(GL_TEXTURE_3D, volumeTexture->GetTextureId());
+		
+		ogl->glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		ogl->glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		ogl->glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+		ogl->glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+		ogl->glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
+		float bcolor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+		ogl->glTexParameterfv(GL_TEXTURE_3D, GL_TEXTURE_BORDER_COLOR, bcolor);
 	}
 	else
 	{
@@ -266,6 +274,11 @@ void TextureVolumeObject::Render(glm::mat4 viewMatrix, glm::mat4 projectionMatri
 	if(lutTexture != NULL)
 	{
 		ogl->glBindTexture(GL_TEXTURE_1D, lutTexture->GetTextureId());
+		
+		ogl->glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		ogl->glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		ogl->glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		ogl->glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	}
 	else
 	{
