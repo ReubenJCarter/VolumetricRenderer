@@ -87,6 +87,8 @@ void RenderViewport::initializeGL()
 	AxisObject::InitSystem(); 
 	axisObject->Init();
 	axisObject->SetVisible(false);
+	
+	SetBackFaceCulling(true);
 }
 
 void RenderViewport::resizeGL(int w, int h)

@@ -36,4 +36,5 @@ ImageSettings::ImageSettings()
 	checkBackFaceCulling = new QCheckBox(""); 
 	layoutGroup->addWidget(new QLabel("Back Face Culling"));
 	layoutGroup->addWidget(checkBackFaceCulling);
+	checkBackFaceCulling->setCheckState(Qt::Checked);
 }

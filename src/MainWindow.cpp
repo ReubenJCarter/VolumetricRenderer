@@ -82,6 +82,7 @@ MainWindow::MainWindow()
 		renderViewport.SetBackFaceCulling(value);
 	});
 	
+	
 	//central
 	setCentralWidget(&renderViewport);
 
