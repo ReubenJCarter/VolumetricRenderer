@@ -21,6 +21,7 @@ bool Image3DFromTIFFFileSequence(Image3D* image, std::vector<std::string> fileNa
 			{
 				width = w;
 				height = h;
+				firstRun = false; 
 			}
 			else
 			{

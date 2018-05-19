@@ -54,6 +54,7 @@ uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
 uniform sampler3D volumeTexture;
 uniform sampler3D gradientTexture;
+uniform samplerCube envMapTexture;
 uniform vec3 texDim;
 uniform float brightness;
 uniform float contrast;
@@ -149,72 +150,94 @@ vec3 FetchGradient(vec3 position)
 	return texture(gradientTexture, (position.xyz * vec3(1, 1, 1/dasp) + vec3(0.5f, 0.5f, 0.5f))).xyz - vec3(0.5f, 0.5f, 0.5f);
 }
 
+vec4 FetchEnvMap(vec3 dir)
+{
+	return texture(envMapTexture, dir);
+}
+
 //main
 void main()
 {
 	vec3 rayDirNorm = normalize(rayDir); 
-	vec3 rayDirInv= vec3(1, 1, 1) / rayDirNorm; 
-	vec3 lightDir0 = vec3(0.707f, -0.707f, 0);
-	vec3 lightDir1 = vec3(-0.707f, 0, 0.707f);
-	vec3 lightDir2 = vec3(0, 0.707f, -0.707f);
+	vec3 rayDirInv = vec3(1, 1, 1) / rayDirNorm; 
+
+	HitInfo hit = RayAABBIntersect(rayOrig, rayDirInv, vec3(-0.5, -0.5, -0.5), vec3(0.5, 0.5, 0.5), BIGNUM);
 	
-	HitInfo hi = RayAABBIntersect(rayOrig, rayDirInv, vec3(-0.5, -0.5, -0.5), vec3(0.5, 0.5, 0.5), BIGNUM);
-	
-	if(!hi.hit)
-		discard;
-	
+
 	float stepSize = 0.002f;
-	vec3 rayStart = rayOrig + rayDirNorm * (hi.dist + stepSize + Random(gl_FragCoord.xy, 1234) * stepSize);
 	
-	vec4 finalColor = vec4(0, 0, 0, 0);
+	vec3 sampleColor = vec3(0, 0, 0);
 	
+	int sampleNumber = 100; 
 	
-	for(int i = 0; i < 500; i++)
+	int photonMarchCount = 800;
+	
+	if(hit.hit)
 	{
-		vec3 gradient = FetchGradient(rayStart);
-		float gradientLen = length(gradient);
-		 		
-		if(gradientLen > gradientThreshold)
+	
+		for(int s = 0; s < sampleNumber; s++)
 		{
-			vec3 gradientNorm = normalize(gradient);
-			if(dot(-rayDirNorm, gradientNorm) > 0 || !bool(backFaceCulling))
+		
+		vec3 finalColor = vec3(0, 0, 0);
+		vec3 runningReflectanceFactor = vec3(1.0f, 1.0f, 1.0f);
+		
+		vec3 photonDir = rayDirNorm; 
+		vec3 photonPos = rayOrig + rayDirNorm * (hit.dist + stepSize + Random(gl_FragCoord.xy, 1234) * stepSize);
+		
+		for(int i = 0; i < photonMarchCount; i++)
+		{
+			
+			vec3 gradient = FetchGradient(photonPos);
+			float gradientLen = length(gradient);
+					
+			if(gradientLen > gradientThreshold)
 			{
-				vec4 col = Fetch3DVolume(rayStart + -gradientNorm * stepSize * 3);
-				vec4 surface = texture(lutTexture, col.r);
-				vec3 surfacecol = surface.xyz; 
-				float surfaceopacity = surface.w;
-				
-				
-				
-				float diffuse = 0.5 * max(0, dot(gradientNorm, lightDir0)) + 
-								0.5 * max(0, dot(gradientNorm, lightDir1)) +
-								0.2 * max(0, dot(gradientNorm, lightDir2));
-				float ambient = 0.2f;
-				
-				
-				vec3 reflection0 = 2 * max(0, dot(lightDir0, gradientNorm)) * gradientNorm - lightDir0; 
-				vec3 reflection1 = 2 * max(0, dot(lightDir1, gradientNorm)) * gradientNorm - lightDir1; 
-				vec3 reflection2 = 2 * max(0, dot(lightDir2, gradientNorm)) * gradientNorm - lightDir2; 
-				
-				float specular = 0.3 * pow(max(0, dot(reflection0, -rayDirNorm)), 30) + 
-								 0.3 * pow(max(0, dot(reflection1, -rayDirNorm)), 30) +
-								 0.3 * pow(max(0, dot(reflection2, -rayDirNorm)), 30);
-								 
-				vec3 phong  = ambient * surfacecol + diffuse * surfacecol + specular * vec3(1, 1, 1);
-				finalColor = vec4(phong.x, phong.y, phong.z, 1.0f);
+				vec3 gradientNorm = normalize(gradient);
+				if(dot(-photonDir, gradientNorm) > 0 || !bool(backFaceCulling))
+				{
+					vec4 col = Fetch3DVolume(photonPos + -gradientNorm * stepSize * 3);
+					vec4 surface = texture(lutTexture, col.r);
+					vec3 surfacecol = surface.xyz; 
+					float surfaceopacity = surface.w;
+					
+					
+					vec2 randomVec2 = vec2(float(i * sampleNumber + s) / float(sampleNumber * photonMarchCount),
+										   float(s * photonMarchCount + i) / float(sampleNumber * photonMarchCount));
+					vec3 newRayD = RandomUnitHemi(Random(gl_FragCoord.xy, randomVec2) * 2.0f - vec2(1.0f, 1.0f), gradientNorm);
+					vec3 reflectanceFactor = max(0.0f, dot(newRayD, gradientNorm)) * surface.xyz;
+					runningReflectanceFactor *= reflectanceFactor;
+					
+					photonDir = newRayD;
+				}
+			}
+					
+			photonPos += photonDir * stepSize;
+			
+			if(photonPos.x > 0.5f || photonPos.y > 0.5f || photonPos.z > 0.5f || 
+			   photonPos.x < -0.5f || photonPos.y < -0.5f || photonPos.z < -0.5f)
+			{
+				vec4 backgroundTex = FetchEnvMap(photonDir);
+				vec3 materialEmittance = backgroundTex.xyz;
+				finalColor += runningReflectanceFactor * materialEmittance;
 				break; 
 			}
 		}
-				
 		
-		rayStart += rayDirNorm * stepSize;
+		sampleColor += finalColor;
 		
-		if(rayStart.x > 0.5 || rayStart.y > 0.5 || rayStart.z > 0.5 || rayStart.x < -0.5 || rayStart.y < -0.5 || rayStart.z < -0.5)
-			break; 
+		}
+	}
+	else
+	{
+		vec4 backgroundTex = FetchEnvMap(rayDirNorm);
+		vec3 materialEmittance = backgroundTex.xyz * 1.0f;
+		sampleColor = backgroundTex.xyz;
+		sampleNumber= 1;
 	}
 	
+	sampleColor *= 1.0f / float(sampleNumber);//average
 	
-	outputColor = finalColor;
+	outputColor = vec4(sampleColor.x, sampleColor.y, sampleColor.z, 1.0f);
 }
 )";
  
@@ -348,6 +371,8 @@ void PhotonVolumeObject::Init()
 	volumeTexture = NULL; 
 	
 	lutTexture = NULL; 
+	
+	envMapTexture = NULL; 
 }
 
 
@@ -454,7 +479,24 @@ void PhotonVolumeObject::Render(glm::mat4 viewMatrix, glm::mat4 projectionMatrix
 		ogl->glBindTexture(GL_TEXTURE_1D, 0);
 	}
 	
+	//update env map texture
+	int envMapTextureLocation = ogl->glGetUniformLocation(programShaderObject, "envMapTexture"); 
+	ogl->glUniform1i(envMapTextureLocation, 3);
+	ogl->glActiveTexture(GL_TEXTURE0 + 3);
 	
+	if(envMapTexture != NULL)
+	{
+		ogl->glBindTexture(GL_TEXTURE_CUBE_MAP, envMapTexture->GetTextureId());
+		
+		ogl->glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		ogl->glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		ogl->glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		ogl->glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	}
+	else
+	{
+		ogl->glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+	}
 	
 	//update material uniforms
 	int materialAlphaLocation = ogl->glGetUniformLocation(programShaderObject, "brightness"); 
@@ -506,6 +548,11 @@ void PhotonVolumeObject::SetGradientTexture(Texture3D* gt)
 void PhotonVolumeObject::SetLUTTexture(Texture1D* lt)
 {
 	lutTexture = lt;
+}
+
+void PhotonVolumeObject::SetEnvMap(TextureCube* env)
+{
+	envMapTexture = env; 
 }
 
 void PhotonVolumeObject::SetGradientThreshold(float gt)

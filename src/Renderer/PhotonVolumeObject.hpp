@@ -3,6 +3,7 @@
 
 #include "Object3D.hpp"
 #include "Texture3D.hpp"
+#include "TextureCube.hpp"
 #include "Texture1D.hpp"
 
 
@@ -35,6 +36,7 @@ class PhotonVolumeObject: public Object3D
 		
 		Texture3D* volumeTexture; 
 		Texture3D* gradientTexture; 
+		TextureCube* envMapTexture;
 		
 		unsigned int volumeSlices;
 		
@@ -65,6 +67,7 @@ class PhotonVolumeObject: public Object3D
 		void SetVolumeTexture(Texture3D* vt);
 		void SetGradientTexture(Texture3D* gt);
 		void SetLUTTexture(Texture1D* lt);
+		void SetEnvMap(TextureCube* env);
 		void SetGradientThreshold(float gt);
 		void SetBackFaceCulling(bool cull);
 };

@@ -17,7 +17,12 @@ class TextureCube
 		TextureCube();
 		void Allocate(uint64_t w, uint64_t h, bool compressed=true, int chan=4);
 		void Destroy();
-		void LoadData(void* xPosBuf, void* xNegBuf, void* yPosBuf, void* yNegBuf, void* zPosBuf, void* zNegBuf);
+		void LoadDataXPos(void* xPosBuf);
+		void LoadDataXNeg(void* xNegBuf);
+		void LoadDataYPos(void* yPosBuf);
+		void LoadDataYNeg(void* yNegBuf);
+		void LoadDataZPos(void* zPosBuf);
+		void LoadDataZNeg(void* zNegBuf);
 		unsigned int GetTextureId();
 		uint64_t Width();
 		uint64_t Height();

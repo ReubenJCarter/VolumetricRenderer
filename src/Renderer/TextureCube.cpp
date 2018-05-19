@@ -49,20 +49,63 @@ void TextureCube::Destroy()
 	ogl->glDeleteTextures(1, &textureId);
 }
 
-void TextureCube::LoadData(void* xPosBuf, void* xNegBuf, void* yPosBuf, void* yNegBuf, void* zPosBuf, void* zNegBuf)
+
+void TextureCube::LoadDataXPos(void* xPosBuf)
 {
 	OPENGL_FUNC_MACRO
-
 	int dataFormats[] = {GL_RED, GL_RG, GL_RGB, GL_RGBA}; 
-	
 	ogl->glBindTexture(GL_TEXTURE_CUBE_MAP, textureId);
 	ogl->glTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, 0, 0, width, height, dataFormats[channels-1], GL_UNSIGNED_BYTE, xPosBuf);
-	ogl->glTexSubImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, 0, 0, width, height, dataFormats[channels-1], GL_UNSIGNED_BYTE, xNegBuf);
-	ogl->glTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, 0, 0, width, height, dataFormats[channels-1], GL_UNSIGNED_BYTE, yPosBuf);
-	ogl->glTexSubImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, 0, 0, width, height, dataFormats[channels-1], GL_UNSIGNED_BYTE, yNegBuf);
-	ogl->glTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, 0, 0, width, height, dataFormats[channels-1], GL_UNSIGNED_BYTE, zPosBuf);
-	ogl->glTexSubImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, 0, 0, width, height, dataFormats[channels-1], GL_UNSIGNED_BYTE, zNegBuf);
+	ogl->glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+}
 
+
+void TextureCube::LoadDataXNeg(void* xNegBuf)
+{
+	OPENGL_FUNC_MACRO
+	int dataFormats[] = {GL_RED, GL_RG, GL_RGB, GL_RGBA}; 
+	ogl->glBindTexture(GL_TEXTURE_CUBE_MAP, textureId);
+	ogl->glTexSubImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, 0, 0, width, height, dataFormats[channels-1], GL_UNSIGNED_BYTE, xNegBuf);
+	ogl->glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+}
+
+
+void TextureCube::LoadDataYPos(void* yPosBuf)
+{
+	OPENGL_FUNC_MACRO
+	int dataFormats[] = {GL_RED, GL_RG, GL_RGB, GL_RGBA}; 
+	ogl->glBindTexture(GL_TEXTURE_CUBE_MAP, textureId);
+	ogl->glTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, 0, 0, width, height, dataFormats[channels-1], GL_UNSIGNED_BYTE, yPosBuf);
+	ogl->glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+}
+
+
+void TextureCube::LoadDataYNeg(void* yNegBuf)
+{
+	OPENGL_FUNC_MACRO
+	int dataFormats[] = {GL_RED, GL_RG, GL_RGB, GL_RGBA}; 
+	ogl->glBindTexture(GL_TEXTURE_CUBE_MAP, textureId);
+	ogl->glTexSubImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, 0, 0, width, height, dataFormats[channels-1], GL_UNSIGNED_BYTE, yNegBuf);
+	ogl->glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+}
+
+
+void TextureCube::LoadDataZPos(void* zPosBuf)
+{
+	OPENGL_FUNC_MACRO
+	int dataFormats[] = {GL_RED, GL_RG, GL_RGB, GL_RGBA}; 
+	ogl->glBindTexture(GL_TEXTURE_CUBE_MAP, textureId);
+	ogl->glTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, 0, 0, width, height, dataFormats[channels-1], GL_UNSIGNED_BYTE, zPosBuf);
+	ogl->glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+}
+
+
+void TextureCube::LoadDataZNeg(void* zNegBuf)
+{
+	OPENGL_FUNC_MACRO
+	int dataFormats[] = {GL_RED, GL_RG, GL_RGB, GL_RGBA}; 
+	ogl->glBindTexture(GL_TEXTURE_CUBE_MAP, textureId);
+	ogl->glTexSubImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, 0, 0, width, height, dataFormats[channels-1], GL_UNSIGNED_BYTE, zNegBuf);
 	ogl->glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 }
 

@@ -8,6 +8,7 @@
 #include "Renderer/RayVolumeObject.hpp"
 #include "Renderer/PhotonVolumeObject.hpp"
 #include "Renderer/Texture3D.hpp"
+#include "Renderer/TextureCube.hpp"
 #include "Renderer/Texture1D.hpp"
 #include "Renderer/CameraControl.hpp"
 #include "Renderer/AxisObject.hpp"
@@ -41,6 +42,7 @@ class RenderViewport: public QOpenGLWidget
 		PhotonVolumeObject* photonVolumeObject;
 		Texture3D* textureVolume; 
 		Texture3D* textureGradient; 
+		TextureCube* textureEnvMap; 
 		Texture1D* textureLUT; 
 		AxisObject* axisObject;
 		
@@ -52,6 +54,7 @@ class RenderViewport: public QOpenGLWidget
 		void ImportDicomFileSequence(QStringList fileNames);
 		void ImportTIFFFileSequence(QStringList fileNames);
 		void LoadLUT(float* buffer, int sizeLUT);
+		void LoadDefaultEnvMap();
 		void ChooseRenderer(RENDER_TYPE rt);
 		void SetGradientThreshold(float threshold);
 		void SetBackFaceCulling(bool cull); 

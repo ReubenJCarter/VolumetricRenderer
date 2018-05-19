@@ -38,6 +38,13 @@ set(LIBTIFF_BIN_DIR ${LIBTIFF_ROOT_DIR}/bin)
 include_directories(${LIBTIFF_INC_DIR})
 link_directories(${LIBTIFF_LIB_DIR})
 
+#libpng
+set(LIBPNG_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ext/libpng/build/install CACHE PATH "Path to libpng")
+set(LIBPNG_INC_DIR ${LIBPNG_ROOT_DIR}/include)
+set(LIBPNG_LIB_DIR ${LIBPNG_ROOT_DIR}/lib)
+set(LIBPNG_BIN_DIR ${LIBPNG_ROOT_DIR}/bin)
+include_directories(${LIBPNG_INC_DIR})
+link_directories(${LIBPNG_LIB_DIR})
 
 
 include_directories(src)
@@ -80,6 +87,7 @@ install(FILES ${QT_BIN_DIR}/Qt5Core.dll
 			  ${DCMTK_BIN_DIR}/ijg16.dll
 			  ${DCMTK_BIN_DIR}/oflog.dll
 			  ${DCMTK_BIN_DIR}/ofstd.dll
+			  ${LIBPNG_BIN_DIR}/libpng16.dll
 			  
 		DESTINATION bin
 		COMPONENT MainApplication

@@ -7,6 +7,7 @@
 
 #include "IO/Image3DFromDicomFile.hpp"
 #include "IO/Image3DFromTIFFFile.hpp"
+#include "IO/Image3DFromPNGFile.hpp"
 
 
 RenderViewport::RenderViewport()
@@ -59,6 +60,8 @@ void RenderViewport::initializeGL()
 	
 	textureLUT = new Texture1D;
 	
+	textureEnvMap = new TextureCube; 
+	
 	//Load Default LUT texture
 	int sizeLUT = 256; 
 	std::vector<float> bufferLUT(sizeLUT * 4);
@@ -70,6 +73,8 @@ void RenderViewport::initializeGL()
 		bufferLUT[i * 4 + 3] = (double)i / (double)sizeLUT; 
 	}
 	LoadLUT(&bufferLUT[0], sizeLUT);
+	
+	LoadDefaultEnvMap();
 
 	textureVolumeObject->SetVolumeTexture(textureVolume); 
 	textureVolumeObject->SetGradientTexture(textureGradient); 
@@ -82,6 +87,7 @@ void RenderViewport::initializeGL()
 	photonVolumeObject->SetVolumeTexture(textureVolume); 
 	photonVolumeObject->SetGradientTexture(textureGradient); 
 	photonVolumeObject->SetLUTTexture(textureLUT); 
+	photonVolumeObject->SetEnvMap(textureEnvMap);
 	
 	axisObject = new AxisObject();
 	AxisObject::InitSystem(); 
@@ -209,6 +215,104 @@ void RenderViewport::LoadLUT(float* buffer, int sizeLUT)
 	if(textureLUT->Width() != sizeLUT)
 		textureLUT->Allocate(sizeLUT);
 	textureLUT->LoadData(buffer);
+	
+	update();
+}
+
+void RenderViewport::LoadDefaultEnvMap()
+{
+	uint64_t W = 1024;
+	uint64_t H = 1024;
+	Image3D posX(W, H, 1, 4);
+	Image3D negX(W, H, 1, 4);
+	Image3D posY(W, H, 1, 4);
+	Image3D negY(W, H, 1, 4);
+	Image3D posZ(W, H, 1, 4);
+	Image3D negZ(W, H, 1, 4);
+	unsigned char* posXData = (unsigned char*)posX.Data();
+	unsigned char* negXData = (unsigned char*)negX.Data();
+	unsigned char* posYData = (unsigned char*)posY.Data();
+	unsigned char* negYData = (unsigned char*)negY.Data();
+	unsigned char* posZData = (unsigned char*)posZ.Data();
+	unsigned char* negZData = (unsigned char*)negZ.Data();
+	
+	///Draw a default scene with a floor and a light
+	for(uint64_t y = 0; y < H; y++)
+	{
+		
+				
+		for(uint64_t x = 0; x < W; x++)
+		{
+			//gradient
+			double minDist = 3; 
+			double maxDist = 4; 
+			double xx = 2 * ((double)x - (double)W / 2.0) / (double)W;
+			double yy = 2 * ((double)y - (double)H / 2.0) / (double)H;			
+			double zz = 1;
+			double planeHeight = -1.0;
+				
+			glm::dvec3 ray = glm::normalize(glm::dvec3(xx, yy, zz));
+			
+			double frac = 1;
+			if(ray.y > 0.001)
+			{
+				double dist;
+				glm::dvec3 P;
+				P = planeHeight / ray.y * ray;
+				P.y = 0;
+				dist = glm::length(P); 
+				frac = (dist - minDist) / (maxDist - minDist); 
+			}
+		
+				
+			frac = frac < 0.0 ? 0.0 : frac;
+			frac = frac > 1.0 ? 1.0 : frac;
+		
+			//Left Image
+			posXData[(y * W + x) * 4] = (190 - 100) * frac + 100;
+			posXData[(y * W + x) * 4 + 1] = (190 - 100) * frac + 100;
+			posXData[(y * W + x) * 4 + 2] = (210 - 100) * frac + 100;
+			posXData[(y * W + x) * 4 + 3] = 255;
+			
+			//Right Image
+			negXData[(y * W + x) * 4] = (190 - 100) * frac + 100;
+			negXData[(y * W + x) * 4 + 1] = (190 - 100) * frac + 100;
+			negXData[(y * W + x) * 4 + 2] = (210 - 100) * frac + 100;
+			negXData[(y * W + x) * 4 + 3] = 255;
+			
+			//Top Image
+			posYData[(y * W + x) * 4] = 190;
+			posYData[(y * W + x) * 4 + 1] = 190;
+			posYData[(y * W + x) * 4 + 2] = 210;
+			posYData[(y * W + x) * 4 + 3] = 255;
+			
+			//Bottom Image
+			negYData[(y * W + x) * 4] = 100;
+			negYData[(y * W + x) * 4 + 1] = 100;
+			negYData[(y * W + x) * 4 + 2] = 100;
+			negYData[(y * W + x) * 4 + 3] = 255;
+			
+			//Forward Image
+			posZData[(y * W + x) * 4] = (190 - 100) * frac + 100;;
+			posZData[(y * W + x) * 4 + 1] = (190 - 100) * frac + 100;;
+			posZData[(y * W + x) * 4 + 2] = (210 - 100) * frac + 100;
+			posZData[(y * W + x) * 4 + 3] = 255;
+			
+			//Back Image
+			negZData[(y * W + x) * 4] = (190 - 100) * frac + 100;;
+			negZData[(y * W + x) * 4 + 1] = (190 - 100) * frac + 100;;
+			negZData[(y * W + x) * 4 + 2] = (210 - 100) * frac + 100;
+			negZData[(y * W + x) * 4 + 3] = 255;
+		}
+	}
+	
+	textureEnvMap->Allocate(W, H, false, 4);
+	textureEnvMap->LoadDataXPos(posXData);
+	textureEnvMap->LoadDataXNeg(negXData);
+	textureEnvMap->LoadDataYPos(posYData);
+	textureEnvMap->LoadDataYNeg(negYData);
+	textureEnvMap->LoadDataZPos(posZData);
+	textureEnvMap->LoadDataZNeg(negZData);
 	
 	update();
 }
