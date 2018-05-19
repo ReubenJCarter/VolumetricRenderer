@@ -53,7 +53,7 @@ add_subdirectory(src)
 
 
 #installer stuff
-set(QT_BIN_DIR "C:/Qt/5.10.1/msvc2015_64/bin")
+set(QT_BIN_DIR "C:/Qt/5.10.1/msvc2017_64/bin")
 install(FILES ${QT_BIN_DIR}/Qt5Core.dll
 			  ${QT_BIN_DIR}/Qt5Gui.dll
 			  ${QT_BIN_DIR}/Qt5Widgets.dll
@@ -91,6 +91,11 @@ install(FILES ${QT_BIN_DIR}/Qt5Core.dll
 			  
 		DESTINATION bin
 		COMPONENT MainApplication
+)
+
+install(DIRECTORY ${QT_BIN_DIR}/../plugins/platforms
+DESTINATION bin
+COMPONENT MainApplication
 )
 
 set(CPACK_PACKAGE_NAME "VolumetricRenderer")
