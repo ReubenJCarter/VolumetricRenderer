@@ -36,7 +36,7 @@ void RenderViewport::initializeGL()
 	cameraObject = new CameraObject;
 	cameraControl = new CameraControl(cameraObject);
 	
-	connect(cameraControl, &CameraControl::CameraUpdated, [this](){update(); });
+	connect(cameraControl, &CameraControl::CameraUpdated, [this](){photonVolumeObject->ClearPhotonRender(windowWidth, windowHeight); update(); });
 	
 	TextureVolumeObject::InitSystem(); 
 	textureVolumeObject = new TextureVolumeObject;
@@ -95,12 +95,22 @@ void RenderViewport::initializeGL()
 	axisObject->SetVisible(false);
 	
 	SetBackFaceCulling(true);
+	
+	//Update the viewport in real time if the photon volume object is in use
+	QTimer* updateTimer = new QTimer();
+	updateTimer->setInterval(1);
+	connect(updateTimer, &QTimer::timeout, [this]()
+	{
+		if(photonVolumeObject->GetVisible()) update();
+	});
+	updateTimer->start(1);
 }
 
 void RenderViewport::resizeGL(int w, int h)
 {
 	windowWidth = w;
 	windowHeight = h;
+	photonVolumeObject->ClearPhotonRender(windowWidth, windowHeight);
 }
 
 void RenderViewport::paintGL()
@@ -176,6 +186,7 @@ void RenderViewport::ImportDicomFileSequence(QStringList fileNames)
 	textureVolume->Allocate(image3D.Width(), image3D.Height(), image3D.Depth());
 	textureVolume->LoadData(image3D.Data());
 	
+	photonVolumeObject->ClearPhotonRender(windowWidth, windowHeight);
 	update();
 }
 
@@ -207,6 +218,7 @@ void RenderViewport::ImportTIFFFileSequence(QStringList fileNames)
 	textureGradient->Allocate(gradient3D.Width(), gradient3D.Height(), gradient3D.Depth(), false, 3);
 	textureGradient->LoadData(gradient3D.Data());
 	
+	photonVolumeObject->ClearPhotonRender(windowWidth, windowHeight);
 	update();
 }
 
@@ -216,6 +228,7 @@ void RenderViewport::LoadLUT(float* buffer, int sizeLUT)
 		textureLUT->Allocate(sizeLUT);
 	textureLUT->LoadData(buffer);
 	
+	photonVolumeObject->ClearPhotonRender(windowWidth, windowHeight);
 	update();
 }
 
@@ -314,6 +327,7 @@ void RenderViewport::LoadDefaultEnvMap()
 	textureEnvMap->LoadDataZPos(posZData);
 	textureEnvMap->LoadDataZNeg(negZData);
 	
+	photonVolumeObject->ClearPhotonRender(windowWidth, windowHeight);
 	update();
 }
 
@@ -338,6 +352,8 @@ void RenderViewport::ChooseRenderer(RENDER_TYPE rt)
 		rayVolumeObject->SetVisible(false); 
 		photonVolumeObject->SetVisible(true); 
 	}
+	
+	photonVolumeObject->ClearPhotonRender(windowWidth, windowHeight);
 	update();
 }
 
@@ -345,6 +361,8 @@ void RenderViewport::SetGradientThreshold(float threshold)
 {
 	rayVolumeObject->SetGradientThreshold(threshold);
 	photonVolumeObject->SetGradientThreshold(threshold);
+	
+	photonVolumeObject->ClearPhotonRender(windowWidth, windowHeight);
 	update();
 }
 
@@ -352,5 +370,7 @@ void RenderViewport::SetBackFaceCulling(bool cull)
 {
 	rayVolumeObject->SetBackFaceCulling(cull);
 	photonVolumeObject->SetBackFaceCulling(cull);
+	
+	photonVolumeObject->ClearPhotonRender(windowWidth, windowHeight);
 	update();
 }

@@ -3,6 +3,29 @@
 
 #include "Util.hpp"
 
+std::string PhotonVolumeObject::displayVertSrc = R"(
+#version 330
+layout(location = 0) in vec4 pointPosition;
+out vec2 texco;
+void main()
+{
+	texco = vec2(pointPosition.x*0.5 + 0.5, pointPosition.y*0.5 + 0.5);
+	gl_Position = vec4(pointPosition.x, pointPosition.y, pointPosition.z, 1.0f);
+}
+)";
+std::string PhotonVolumeObject::displayFragSrc = R"(
+#version 330
+in vec2 texco;
+uniform sampler2D frameBufferTexture;
+uniform int sampleNumber; 
+layout(location = 0) out vec4 outputColor; 
+void main()
+{
+	vec4 samples = texture(frameBufferTexture, texco) * 1.0 / float(sampleNumber);
+	outputColor = vec4(samples.x, samples.y, samples.z, 1.0f);
+}
+)";
+
 
 std::string PhotonVolumeObject::vertSrc= R"(
 #version 330
@@ -50,6 +73,8 @@ in vec3 rayOrig;
 in vec3 rayDir;
 
 //uniforms
+uniform float randomFloat0;
+uniform float randomFloat1;
 uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
 uniform sampler3D volumeTexture;
@@ -168,7 +193,7 @@ void main()
 	
 	vec3 sampleColor = vec3(0, 0, 0);
 	
-	int sampleNumber = 100; 
+	int sampleNumber = 1; 
 	
 	int photonMarchCount = 800;
 	
@@ -201,9 +226,9 @@ void main()
 					float surfaceopacity = surface.w;
 					
 					
-					vec2 randomVec2 = vec2(float(i * sampleNumber + s) / float(sampleNumber * photonMarchCount),
-										   float(s * photonMarchCount + i) / float(sampleNumber * photonMarchCount));
-					vec3 newRayD = RandomUnitHemi(Random(gl_FragCoord.xy, randomVec2) * 2.0f - vec2(1.0f, 1.0f), gradientNorm);
+					vec2 randomSeedVec2 = vec2(randomFloat0 * float(i * sampleNumber + s) / float(sampleNumber * photonMarchCount),
+											   randomFloat1 * float(s * photonMarchCount + i) / float(sampleNumber * photonMarchCount));
+					vec3 newRayD = RandomUnitHemi(Random(gl_FragCoord.xy, randomSeedVec2) * 2.0f - vec2(1.0f, 1.0f), gradientNorm);
 					vec3 reflectanceFactor = max(0.0f, dot(newRayD, gradientNorm)) * surface.xyz;
 					runningReflectanceFactor *= reflectanceFactor;
 					
@@ -244,6 +269,9 @@ void main()
 int PhotonVolumeObject::programShaderObject;
 int PhotonVolumeObject::vertexShaderObject;
 int PhotonVolumeObject::fragmentShaderObject;
+int PhotonVolumeObject::displayProgramShaderObject;
+int PhotonVolumeObject::displayVertexShaderObject;
+int PhotonVolumeObject::displayFragmentShaderObject;
  
 void PhotonVolumeObject::InitSystem()
 {
@@ -252,10 +280,11 @@ void PhotonVolumeObject::InitSystem()
 	//make array to pointer for source code (needed for opengl )
 	const char* vsrc[1];
 	const char* fsrc[1];
-	vsrc[0] = vertSrc.c_str();
-	fsrc[0] = fragSrc.c_str();
+	
 	
 	//compile vertex and fragment shaders from source
+	vsrc[0] = vertSrc.c_str();
+	fsrc[0] = fragSrc.c_str();
 	vertexShaderObject = ogl->glCreateShader(GL_VERTEX_SHADER);
 	ogl->glShaderSource(vertexShaderObject, 1, vsrc, NULL);
 	ogl->glCompileShader(vertexShaderObject);
@@ -263,11 +292,25 @@ void PhotonVolumeObject::InitSystem()
 	ogl->glShaderSource(fragmentShaderObject, 1, fsrc, NULL);
 	ogl->glCompileShader(fragmentShaderObject);
 	
+	vsrc[0] = displayVertSrc.c_str();
+	fsrc[0] = displayFragSrc.c_str();
+	displayVertexShaderObject = ogl->glCreateShader(GL_VERTEX_SHADER);
+	ogl->glShaderSource(displayVertexShaderObject, 1, vsrc, NULL);
+	ogl->glCompileShader(displayVertexShaderObject);
+	displayFragmentShaderObject = ogl->glCreateShader(GL_FRAGMENT_SHADER);
+	ogl->glShaderSource(displayFragmentShaderObject, 1, fsrc, NULL);
+	ogl->glCompileShader(displayFragmentShaderObject);
+	
 	//link vertex and fragment shader to create shader program object
 	programShaderObject = ogl->glCreateProgram();
 	ogl->glAttachShader(programShaderObject, vertexShaderObject);
 	ogl->glAttachShader(programShaderObject, fragmentShaderObject);
 	ogl->glLinkProgram(programShaderObject);
+	
+	displayProgramShaderObject = ogl->glCreateProgram();
+	ogl->glAttachShader(displayProgramShaderObject, displayVertexShaderObject);
+	ogl->glAttachShader(displayProgramShaderObject, displayFragmentShaderObject);
+	ogl->glLinkProgram(displayProgramShaderObject);
 	
 	//Check status of shader and log any compile time errors
 	int linkStatus;
@@ -277,7 +320,7 @@ void PhotonVolumeObject::InitSystem()
 		char log[5000];
 		int logLen; 
 		ogl->glGetProgramInfoLog(programShaderObject, 5000, &logLen, log);
-		std::cerr << "TextureVolumeObject:Could not link program: " << std::endl;
+		std::cerr << "PhotonVolumeObject:Could not link program: " << std::endl;
 		std::cerr << log << std::endl;
 		ogl->glGetShaderInfoLog(vertexShaderObject, 5000, &logLen, log);
 		std::cerr << "vertex shader log:\n" << log << std::endl;
@@ -290,11 +333,35 @@ void PhotonVolumeObject::InitSystem()
 	{
 		std::cout << "PhotonVolumeObject::CompileShader:compile success " << std::endl;
 	}
+	ogl->glGetProgramiv(displayProgramShaderObject, GL_LINK_STATUS, &linkStatus);
+	if (linkStatus != GL_TRUE) 
+	{
+		char log[5000];
+		int logLen; 
+		ogl->glGetProgramInfoLog(displayProgramShaderObject, 5000, &logLen, log);
+		std::cerr << "PhotonVolumeObject:Could not link program: " << std::endl;
+		std::cerr << log << std::endl;
+		ogl->glGetShaderInfoLog(displayVertexShaderObject, 5000, &logLen, log);
+		std::cerr << "vertex shader log:\n" << log << std::endl;
+		ogl->glGetShaderInfoLog(displayFragmentShaderObject, 5000, &logLen, log);
+		std::cerr << "fragment shader log:\n" << log << std::endl;
+		ogl->glDeleteProgram(displayProgramShaderObject);
+		displayProgramShaderObject = 0;
+	}
+	else
+	{
+		std::cout << "PhotonVolumeObject::CompileShader:compile display shader success " << std::endl;
+	}
 }
 
 
 PhotonVolumeObject::PhotonVolumeObject()
 {
+	targetWidth = 800;
+	targetHeight = 600;
+	
+	clearFlag = false; 
+	currentSampleNumber = 0;
 	randomNumberBindingPoint = 0;
 	maxBounce = 20;
 	sampleCount = 100;
@@ -373,6 +440,39 @@ void PhotonVolumeObject::Init()
 	lutTexture = NULL; 
 	
 	envMapTexture = NULL; 
+	
+	//frameBuffer
+	targetWidth = 800;
+	targetHeight = 600;
+	
+	ogl->glGenFramebuffers(1, &frameBuffer); 
+	
+	//Create color attachment texture
+	ogl->glGenTextures(1, &frameBufferColorBuffer);
+	ogl->glBindTexture(GL_TEXTURE_2D, frameBufferColorBuffer);
+	ogl->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, targetWidth, targetHeight, 0, GL_RGB, GL_FLOAT, NULL);
+	ogl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+	ogl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	ogl->glBindTexture(GL_TEXTURE_2D, 0);
+
+	//create depth attachment Render buffer
+	ogl->glGenRenderbuffers(0, &frameBufferDepthBuffer);
+	ogl->glBindRenderbuffer(GL_RENDERBUFFER, frameBufferDepthBuffer);
+	ogl->glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, targetWidth, targetHeight);
+	ogl->glBindRenderbuffer(GL_RENDERBUFFER, 0);
+	
+	// attach texture and render buffer to currently bound framebuffer object
+	int oldFBO;
+	ogl->glGetIntegerv(GL_FRAMEBUFFER_BINDING, &oldFBO);
+	ogl->glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+	ogl->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, frameBufferColorBuffer, 0);
+	ogl->glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, frameBufferDepthBuffer);
+	if(ogl->glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE )
+	{
+		std::cout << "PhotonVolumeObject:Init:ERROR Frame buffer not complete" << std::endl; 
+		
+	}
+	ogl->glBindFramebuffer(GL_FRAMEBUFFER, oldFBO);
 }
 
 
@@ -384,6 +484,18 @@ void PhotonVolumeObject::Render(glm::mat4 viewMatrix, glm::mat4 projectionMatrix
 	
 	OPENGL_FUNC_MACRO
 	
+	//enable frame buffer
+	int oldFBO;
+	ogl->glGetIntegerv(GL_FRAMEBUFFER_BINDING, &oldFBO);
+	ogl->glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+		
+	//clear frame buffer if needed
+	if(clearFlag)
+	{
+		ogl->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		clearFlag = false;
+	}
+
 	//compute mvp matrix
 	glm::mat4 modelMatrix = GetModelMatrix(); 
 	
@@ -404,6 +516,14 @@ void PhotonVolumeObject::Render(glm::mat4 viewMatrix, glm::mat4 projectionMatrix
 	//bind shader
 	ogl->glUseProgram(programShaderObject);
 	
+	//disable depth
+	ogl->glDisable(GL_DEPTH_TEST);
+	ogl->glDepthMask(GL_FALSE);
+	
+	//enable blending
+	ogl->glEnable(GL_BLEND);
+	ogl->glBlendFunc(GL_ONE, GL_ONE);
+
 	//update mvp transform uniform in shader
 	int projectionMatrixLocation = ogl->glGetUniformLocation(programShaderObject, "projectionMatrix"); 
 	ogl->glUniformMatrix4fv(projectionMatrixLocation, 1, false, glm::value_ptr(projectionMatrix));
@@ -499,6 +619,10 @@ void PhotonVolumeObject::Render(glm::mat4 viewMatrix, glm::mat4 projectionMatrix
 	}
 	
 	//update material uniforms
+	int randomFloat0Location = ogl->glGetUniformLocation(programShaderObject, "randomFloat0"); 
+	ogl->glUniform1f(randomFloat0Location, randDist(randGenerator));
+	int randomFloat1Location = ogl->glGetUniformLocation(programShaderObject, "randomFloat1"); 
+	ogl->glUniform1f(randomFloat1Location, randDist(randGenerator));
 	int materialAlphaLocation = ogl->glGetUniformLocation(programShaderObject, "brightness"); 
 	ogl->glUniform1f(materialAlphaLocation, brightness);
 	int materialPointSizeLocation = ogl->glGetUniformLocation(programShaderObject, "contrast"); 
@@ -507,6 +631,14 @@ void PhotonVolumeObject::Render(glm::mat4 viewMatrix, glm::mat4 projectionMatrix
 	ogl->glUniform1f(materialGradientThresholdLocation, gradientThreshold);
 	int materialBackFaceCullingLocation = ogl->glGetUniformLocation(programShaderObject, "backFaceCulling"); 
 	ogl->glUniform1i(materialBackFaceCullingLocation, (int)backFaceCulling);
+	
+	
+	//check if the frame buffer is complete
+	if(ogl->glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE )
+	{
+		std::cout << "PhotonVolumeObject:Init:ERROR Frame buffer not complete" << std::endl; 
+		
+	}
 	
 	//bind VAO
 	ogl->glBindVertexArray(vertexArrayObject);
@@ -521,15 +653,102 @@ void PhotonVolumeObject::Render(glm::mat4 viewMatrix, glm::mat4 projectionMatrix
 	//unbind shader program
 	ogl->glUseProgram(0);
 	
+	//increment sample num
+	currentSampleNumber++;
+	
+	
+	
+	
+	
+	
+	
+	//draw into the display image
+	
+	ogl->glBindFramebuffer(GL_FRAMEBUFFER, oldFBO);
+	ogl->glViewport(0, 0, targetWidth, targetHeight);
+
+	//use display shader program 
+	ogl->glUseProgram(displayProgramShaderObject);
+	
+	//disable depth test and write
+	ogl->glDisable(GL_DEPTH_TEST);
+	
+	//disable blending
+	ogl->glDisable(GL_BLEND);
+	
+	//Bind frame buffer texture
+	int frameBufferTextureLocation = ogl->glGetUniformLocation(displayProgramShaderObject, "frameBufferTexture"); 
+	ogl->glUniform1i(frameBufferTextureLocation, 0);
+	ogl->glActiveTexture(GL_TEXTURE0 + 0);
+	ogl->glBindTexture(GL_TEXTURE_2D, frameBufferColorBuffer);	
+	
+	//sample number uniform
+	int sampleNumberLocation = ogl->glGetUniformLocation(displayProgramShaderObject, "sampleNumber"); 
+	ogl->glUniform1i(sampleNumberLocation, (int)currentSampleNumber);
+	
+	//bind VAO
+	ogl->glBindVertexArray(vertexArrayObject);
+	
+	//draw elements
+	ogl->glDrawArrays(GL_TRIANGLES, 0, 6);
+	
+	
+	//unbind VAO
+	ogl->glBindVertexArray(0);
+	
+	//unbind shader program
+	ogl->glUseProgram(0);
+	
+	//unbind frame buffer texture because we need to be able to clear it later on
+	ogl->glBindTexture(GL_TEXTURE_2D, 0);
+	
+	PrintGLErrors();
 
 }
 
+void PhotonVolumeObject::ClearPhotonRender(int W, int H)
+{
+	if(!visible) return; 
+
+	std::cout << "PhotonVolumeObject: ClearPhotonRender" << std::endl; 
+	
+	OPENGL_FUNC_MACRO
+
+	//zero sample num
+	currentSampleNumber = 0;
+	
+	//reallocate frame buffer texture for size change
+	if(W != targetWidth || H != targetHeight)
+	{
+		targetWidth = W;
+		targetHeight = H;
+		
+		// color attachment texture
+		ogl->glBindTexture(GL_TEXTURE_2D, frameBufferColorBuffer);
+		ogl->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, targetWidth, targetHeight, 0, GL_RGB, GL_FLOAT, NULL);
+		ogl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+		ogl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		ogl->glBindTexture(GL_TEXTURE_2D, 0);
+
+		// depth attachment Render buffer
+		ogl->glBindRenderbuffer(GL_RENDERBUFFER, frameBufferDepthBuffer);
+		ogl->glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, targetWidth, targetHeight);
+		ogl->glBindRenderbuffer(GL_RENDERBUFFER, 0);
+	}
+	
+	//clear frame buffer
+	clearFlag = true; 
+}
 
 void PhotonVolumeObject::Destroy()
 {
 	OPENGL_FUNC_MACRO
 	ogl->glDeleteBuffers(1, &vertexBuffer);
 	ogl->glDeleteVertexArrays(1, &vertexArrayObject);
+	
+	ogl->glDeleteFramebuffers(1, &frameBuffer);
+	ogl->glDeleteTextures(1, &frameBufferColorBuffer);
+	ogl->glDeleteRenderbuffers(1, &frameBufferDepthBuffer);
 }
 
 

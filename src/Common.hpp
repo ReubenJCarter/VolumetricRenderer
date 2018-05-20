@@ -57,3 +57,4 @@
 #include <QOpenGLFunctions>
 #include <QOpenGLFunctions_3_3_Compatibility>
 #include <QOpenGLFunctions_3_3_Core>
+#include <QtCore/QTimer>

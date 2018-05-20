@@ -30,6 +30,11 @@ class PhotonVolumeObject: public Object3D
 		static int programShaderObject;
 		static int vertexShaderObject;
 		static int fragmentShaderObject;
+		static std::string displayVertSrc; 
+		static std::string displayFragSrc; 
+		static int displayProgramShaderObject;
+		static int displayVertexShaderObject;
+		static int displayFragmentShaderObject;
 		
 		
 		Texture1D* lutTexture; 
@@ -47,7 +52,15 @@ class PhotonVolumeObject: public Object3D
 		unsigned int randomBuffer; 
 		unsigned int randomNumberBindingPoint;
 		
+		unsigned int frameBuffer;
+		unsigned int frameBufferColorBuffer;
+		unsigned int frameBufferDepthBuffer;
 		
+		unsigned int targetWidth;
+		unsigned int targetHeight;
+		
+		bool clearFlag; 
+		int currentSampleNumber;
 		int maxBounce; 
 		int sampleCount;
 		float brightness;
@@ -63,6 +76,8 @@ class PhotonVolumeObject: public Object3D
 		virtual void Init();
 		virtual void Render(glm::mat4 viewMatrix, glm::mat4 projectionMatrix);
 		virtual void Destroy();
+		
+		void ClearPhotonRender(int W, int H);
 		
 		void SetVolumeTexture(Texture3D* vt);
 		void SetGradientTexture(Texture3D* gt);
