@@ -58,6 +58,25 @@ uint64_t Image3D::ByteSize()
 	return width * height * depth * pixelSize; 
 }
 
+void Image3D::Copy(Image3D& inImg)
+{
+	unsigned char* indata = (unsigned char*)inImg.Data();
+	for(uint64_t z = 0; z < depth; z++)
+	{
+		for(uint64_t y = 0; y < height; y++)
+		{
+			for(uint64_t x = 0; x < width; x++)
+			{
+				for(uint64_t c = 0; c < pixelSize; c++)
+				{
+					((unsigned char*)data)[(z * width * height + y * width + x) * pixelSize + c] = 
+									indata[(z * width * height + y * width + x) * pixelSize + c];
+				}
+			}
+		}
+	}
+}
+
 void Image3D::Smooth2D()
 {
 	for(uint64_t z = 0; z < depth; z++)

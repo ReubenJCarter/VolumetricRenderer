@@ -24,6 +24,7 @@ class Image3D
 		uint64_t Height();
 		uint64_t Depth();
 		uint64_t ByteSize();
+		void Copy(Image3D& inImg);
 		void Smooth2D();
 		void Median2D();
 		void Smooth();
