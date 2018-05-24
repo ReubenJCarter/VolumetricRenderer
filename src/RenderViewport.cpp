@@ -205,7 +205,7 @@ void RenderViewport::ImportTIFFFileSequence(QStringList fileNames)
 	Image3D IntensityImage;
 	IntensityImage.Allocate(image3D.Width(), image3D.Height(), image3D.Depth(), 4); 
 	IntensityImage.Copy(image3D); 
-	IntensityImage.Smooth();
+	//IntensityImage.Smooth();
 	IntensityImage.Median2D();
 	textureVolume->Allocate(image3D.Width(), image3D.Height(), image3D.Depth(), false);
 	textureVolume->LoadData(IntensityImage.Data());
