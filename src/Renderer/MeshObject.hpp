@@ -32,10 +32,12 @@ class MeshObject: public Object3D
 		int vertexNumber; 
 		int elementNumber; 
 			
-		std::vector<Vertex> verticies; 
-		std::vector<int> elements;
+		
 			
 	public:
+		std::vector<Vertex> verticies; 
+		std::vector<int> elements;
+		
 		static void InitSystem();
 		
 		MeshObject();

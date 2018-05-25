@@ -11,9 +11,12 @@ class Object3D
 		glm::vec3 position;
 		glm::vec3 rotation;
 		glm::vec3 scale;
+		Object3D* parent; 
+		std::vector<Object3D*> children; 
 		
 	public:
 		Object3D();
+		~Object3D();
 		virtual void Init(){}
 		virtual void Render(glm::mat4 viewMatrix, glm::mat4 projectionMatrix){}
 		virtual void Destroy(){}
@@ -26,4 +29,5 @@ class Object3D
 		void SetScale(glm::vec3 sca);
 		bool GetVisible();
 		void SetVisible(bool v);
+		void SetParent(Object3D* par);
 };

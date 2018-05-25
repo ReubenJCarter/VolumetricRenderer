@@ -7,6 +7,23 @@ Object3D::Object3D()
 	rotation = glm::vec3(0, 0, 0);
 	scale = glm::vec3(1, 1, 1);
 	visible = true; 
+	parent = NULL;
+}
+
+Object3D::~Object3D()
+{
+	position = glm::vec3(0, 0, 0); 
+	rotation = glm::vec3(0, 0, 0);
+	scale = glm::vec3(1, 1, 1);
+	visible = true; 
+	if(parent != NULL)
+	{
+		for(int i = 0; i < parent->children.size(); i++)
+		{
+			if(parent->children[i] == this) 
+				parent->children.erase( parent->children.begin() + i);
+		}
+	}
 }
 
 glm::mat4 Object3D::GetModelMatrix()
@@ -59,4 +76,21 @@ bool Object3D::GetVisible()
 void Object3D::SetVisible(bool v)
 {
 	visible = v;
+}
+
+void Object3D::SetParent(Object3D* par)
+{
+	//erase the current parent
+	if(parent != NULL)
+	{
+		for(int i = 0; i < parent->children.size(); i++)
+		{
+			if(parent->children[i] == this) 
+				parent->children.erase( parent->children.begin() + i);
+		}
+	}
+	//add to new parent
+	parent = par;
+	if(parent != NULL)
+		parent->children.push_back(this);
 }

@@ -112,67 +112,9 @@ void MeshObject::Init()
 	//Bind VAO
 	ogl->glBindVertexArray(vertexArrayObject);
 	
-	//build buffers
-	std::vector<Vertex> vertexData(6); 
-
-	Vertex v;
-	v.w = 1;
-	v.a = 255;
-	
-	v.x = -1000;
-	v.y = 0;
-	v.z = 0;
-	v.r = 255;
-	v.g = 0;
-	v.b = 0;
-	vertexData[0] = v;
-	v.x = 1000;
-	v.y = 0;
-	v.z = 0;
-	v.r = 255;
-	v.g = 0;
-	v.b = 0;
-	vertexData[1] = v;
-	v.x = 0;
-	v.y = -1000;
-	v.z = 0;
-	v.r = 0;
-	v.g = 255;
-	v.b = 0;
-	vertexData[2] = v;
-	v.x = 0;
-	v.y = 1000;
-	v.z = 0;
-	v.r = 0;
-	v.g = 255;
-	v.b = 0;
-	vertexData[3] = v;
-	v.x = 0;
-	v.y = 0;
-	v.z = -1000;
-	v.r = 0;
-	v.g = 0;
-	v.b = 255;
-	vertexData[4] = v;
-	v.x = 0;
-	v.y = 0;
-	v.z = 1000;
-	v.r = 0;
-	v.g = 0;
-	v.b = 255;
-	vertexData[5] = v;
-	
-	std::vector<unsigned int> elementData(6); 
-	for(int i = 0; i < 6; i++)
-	{
-		elementData[i] = i;
-	}
-	
 	ogl->glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-	ogl->glBufferData(GL_ARRAY_BUFFER, vertexData.size() * sizeof(Vertex), (char*)&vertexData[0], GL_STATIC_DRAW);
 
 	ogl->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBuffer);
-	ogl->glBufferData(GL_ELEMENT_ARRAY_BUFFER, elementData.size() * sizeof(unsigned int), (char*)&elementData[0], GL_STATIC_DRAW);
 
 	//set vertex attributes
 	ogl->glEnableVertexAttribArray(0);
@@ -245,4 +187,16 @@ void MeshObject::Destroy()
 	ogl->glDeleteBuffers(1, &vertexBuffer);
 	ogl->glDeleteBuffers(1, &elementBuffer);
 	ogl->glDeleteVertexArrays(1, &vertexArrayObject);
+}
+
+void UpdateMeshBuffer()
+{
+	ogl->glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+	ogl->glBufferData(GL_ARRAY_BUFFER, vertexData.size() * sizeof(Vertex), (char*)&vertexData[0], GL_STATIC_DRAW);
+	ogl->glBindBuffer(GL_ARRAY_BUFFER, 0);
+	
+	ogl->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBuffer);
+	ogl->glBufferData(GL_ELEMENT_ARRAY_BUFFER, elementData.size() * sizeof(unsigned int), (char*)&elementData[0], GL_STATIC_DRAW);
+	ogl->glBindBuffer(GL_ARRAY_BUFFER, 0);
+	
 }
