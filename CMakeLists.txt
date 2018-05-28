@@ -46,6 +46,14 @@ set(LIBPNG_BIN_DIR ${LIBPNG_ROOT_DIR}/bin)
 include_directories(${LIBPNG_INC_DIR})
 link_directories(${LIBPNG_LIB_DIR})
 
+#opencv
+set(OPENCV_ROOT_DIR C:/opencv/build CACHE PATH "Path to opencv")
+set(OPENCV_INC_DIR ${OPENCV_ROOT_DIR}/include)
+set(OPENCV_LIB_DIR ${OPENCV_ROOT_DIR}/x64/vc15/lib)
+set(OPENCV_BIN_DIR ${OPENCV_ROOT_DIR}/x64/vc15/bin)
+include_directories(${OPENCV_INC_DIR})
+link_directories(${OPENCV_LIB_DIR})
+
 
 include_directories(src)
 add_subdirectory(src)
@@ -88,7 +96,8 @@ install(FILES ${QT_BIN_DIR}/Qt5Core.dll
 			  ${DCMTK_BIN_DIR}/oflog.dll
 			  ${DCMTK_BIN_DIR}/ofstd.dll
 			  ${LIBPNG_BIN_DIR}/libpng16.dll
-			  
+			  ${OPENCV_BIN_DIR}/opencv_world341d.dll
+			  ${OPENCV_BIN_DIR}/opencv_ffmpeg341_64.dll
 		DESTINATION bin
 		COMPONENT MainApplication
 )

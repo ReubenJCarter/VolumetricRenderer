@@ -494,3 +494,24 @@ void Image3D::Normalize()
 		}
 	}
 }
+
+void Image3D::Histogram(std::vector<float>* histogram)
+{
+	int bins = 256; 
+	histogram->resize(bins, 0);
+	
+	float maxBinCount = 0;
+		
+	for(uint64_t z = 0; z < depth; z++)
+	{
+		for(uint64_t y = 0; y < height; y++)
+		{
+			for(uint64_t x = 0; x < width; x++)
+			{
+				unsigned char r = ((unsigned char*)data)[(z * width * height + y * width + x) * pixelSize + 0];
+				(*histogram)[r] += 1.0f;
+				if((*histogram)[r] > maxBinCount) maxBinCount = (*histogram)[r]; 
+			}
+		}
+	}
+}

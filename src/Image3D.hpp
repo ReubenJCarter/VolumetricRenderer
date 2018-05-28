@@ -32,4 +32,5 @@ class Image3D
 		void CentralDifference(Image3D& inImg);
 		void Sobel(Image3D& inImg);
 		void Normalize();
+		void Histogram(std::vector<float>* histogram);
 };

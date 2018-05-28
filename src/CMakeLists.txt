@@ -37,6 +37,8 @@ target_link_libraries(VolumetricRenderer tiff)
 
 target_link_libraries(VolumetricRenderer libpng16)
 
+target_link_libraries(VolumetricRenderer opencv_world341d)
+
 install(TARGETS VolumetricRenderer
 		RUNTIME
 		DESTINATION bin
