@@ -141,7 +141,7 @@ void MeshObject::Render(glm::mat4 viewMatrix, glm::mat4 projectionMatrix)
 	
 	//compute mvp matrix
 	glm::mat4 modelMatrix = GetModelMatrix(); 
-	glm::mat4 mvpMatrix = projectionMatrix * viewMatrix * GetModelMatrix();
+	glm::mat4 mvpMatrix = projectionMatrix * viewMatrix * modelMatrix;
 		
 	ogl->glEnable(GL_DEPTH_TEST);
 	
@@ -189,14 +189,31 @@ void MeshObject::Destroy()
 	ogl->glDeleteVertexArrays(1, &vertexArrayObject);
 }
 
-void UpdateMeshBuffer()
+void MeshObject::UpdateMeshBuffer()
 {
+	OPENGL_FUNC_MACRO
+	
 	ogl->glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-	ogl->glBufferData(GL_ARRAY_BUFFER, vertexData.size() * sizeof(Vertex), (char*)&vertexData[0], GL_STATIC_DRAW);
+	ogl->glBufferData(GL_ARRAY_BUFFER, verticies.size() * sizeof(Vertex), (char*)&verticies[0], GL_STATIC_DRAW);
 	ogl->glBindBuffer(GL_ARRAY_BUFFER, 0);
 	
 	ogl->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBuffer);
-	ogl->glBufferData(GL_ELEMENT_ARRAY_BUFFER, elementData.size() * sizeof(unsigned int), (char*)&elementData[0], GL_STATIC_DRAW);
+	ogl->glBufferData(GL_ELEMENT_ARRAY_BUFFER, elements.size() * sizeof(unsigned int), (char*)&elements[0], GL_STATIC_DRAW);
 	ogl->glBindBuffer(GL_ARRAY_BUFFER, 0);
 	
+	aabbMin.x = std::numeric_limits<float>::max();
+	aabbMax.x = std::numeric_limits<float>::lowest();
+	aabbMin.y = std::numeric_limits<float>::max();
+	aabbMax.y = std::numeric_limits<float>::lowest();
+	aabbMin.z = std::numeric_limits<float>::max();
+	aabbMax.z = std::numeric_limits<float>::lowest();
+	for(int i = 0; i < verticies.size(); i++)
+	{
+		if(verticies[i].x < aabbMin.x)aabbMin.x = verticies[i].x;
+		if(verticies[i].x > aabbMax.x)aabbMax.x = verticies[i].x;
+		if(verticies[i].y < aabbMin.y)aabbMin.y = verticies[i].y;
+		if(verticies[i].y > aabbMax.y)aabbMax.y = verticies[i].y;
+		if(verticies[i].z < aabbMin.z)aabbMin.z = verticies[i].z;
+		if(verticies[i].z > aabbMax.z)aabbMax.z = verticies[i].z;
+	}
 }

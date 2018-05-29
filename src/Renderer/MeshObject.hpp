@@ -32,7 +32,8 @@ class MeshObject: public Object3D
 		int vertexNumber; 
 		int elementNumber; 
 			
-		
+		glm::vec3 aabbMin;
+		glm::vec3 aabbMax;
 			
 	public:
 		std::vector<Vertex> verticies; 

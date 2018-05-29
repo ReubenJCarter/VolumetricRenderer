@@ -14,6 +14,7 @@ set (volumetricRendererSrc
 		Renderer/Texture3D.cpp
 		Renderer/TextureCube.cpp
 		Renderer/Texture1D.cpp
+		Renderer/MeshObject.cpp
 		Renderer/Object3D.cpp
 		Renderer/TextureVolumeObject.cpp
 		Renderer/RayVolumeObject.cpp
