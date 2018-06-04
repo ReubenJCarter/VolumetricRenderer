@@ -510,13 +510,14 @@ void Image3D::Histogram(std::vector<float>* histogram)
 			{
 				unsigned char r = ((unsigned char*)data)[(z * width * height + y * width + x) * pixelSize + 0];
 				(*histogram)[r] += 1.0f;
-				if((*histogram)[r] > maxBinCount) maxBinCount = (*histogram)[r]; 
+				if((*histogram)[r] > maxBinCount && r != 0) 
+					maxBinCount = (*histogram)[r]; 
 			}
 		}
 	}
 	
 	for(int i = 0; i < bins; i++)
 	{
-		(*histogram)[i] += (*histogram)[i] / maxBinCount;
+		(*histogram)[i] = (*histogram)[i] / maxBinCount;
 	}
 }

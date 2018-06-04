@@ -27,7 +27,9 @@ MainWindow::MainWindow()
 	{
 		QStringList fileNames = QFileDialog::getOpenFileNames(this, tr("Open Image"), "", tr("types of Files(*)"));
 		renderViewport.ImportTIFFFileSequence(fileNames, &(controlPanel.imageSettings->sampleMapping->histogram->data));
+		//renderViewport.ImportTIFFFileSequence(fileNames, NULL);
 		std::cout << "Import Sequence" << std::endl;
+		
 	});
 	
 	QObject::connect(controlPanel.checkAxisVisible, &QCheckBox::stateChanged, [this](int state)

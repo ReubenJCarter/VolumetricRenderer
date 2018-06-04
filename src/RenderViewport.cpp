@@ -190,6 +190,10 @@ void RenderViewport::ImportDicomFileSequence(QStringList fileNames)
 	update();
 }
 
+void RenderViewport::ImportTIFFFile(QString fileNames, std::vector<float>* histogram)
+{
+}
+
 void RenderViewport::ImportTIFFFileSequence(QStringList fileNames, std::vector<float>* histogram)
 {
 	std::vector<std::string> files;
@@ -212,9 +216,11 @@ void RenderViewport::ImportTIFFFileSequence(QStringList fileNames, std::vector<f
 	IntensityImage.Histogram(&textureVolumeHistogram); 
 	if(histogram != NULL)
 	{		
+		histogram->resize(textureVolumeHistogram.size());
 		for(int i = 0; i < textureVolumeHistogram.size(); i++)
 		{
 			(*histogram)[i] = textureVolumeHistogram[i]; 
+			//std::cout << (*histogram)[i] << " "; 
 		}
 	}
 	

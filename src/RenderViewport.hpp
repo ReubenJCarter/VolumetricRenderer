@@ -53,6 +53,7 @@ class RenderViewport: public QOpenGLWidget
 		void EnableDisableAxis(bool en);
 		void ImportDicomFile(QString fileName);
 		void ImportDicomFileSequence(QStringList fileNames);
+		void ImportTIFFFile(QString fileNames, std::vector<float>* histogram=NULL);
 		void ImportTIFFFileSequence(QStringList fileNames, std::vector<float>* histogram=NULL);
 		void LoadLUT(float* buffer, int sizeLUT);
 		void LoadDefaultEnvMap();
