@@ -42,7 +42,7 @@ class SampleMappingHistogram: public QGraphicsItem
 		int viewW;
 		int viewH;
 		
-		std::vector<unsigned char> data; 
+		std::vector<float> data; 
 	
 		SampleMappingHistogram();
 		QRectF boundingRect() const;
@@ -103,11 +103,15 @@ class SampleMappingAxis: public QGraphicsItem
 class SampleMappingEditor: public QGraphicsView
 {
 	Q_OBJECT
+	
+	public:
+		SampleMappingHistogram* histogram;
+		
 	private:
 		QColor prevNodeColor; 
 		SampleMappingNode* selectedNode; 
 		std::vector<SampleMappingNode*> nodes; 
-		SampleMappingHistogram* histogram;
+		
 		SampleMappingCurve* curve;
 		SampleMappingAxis* axis;
 		

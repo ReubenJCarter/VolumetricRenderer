@@ -514,4 +514,9 @@ void Image3D::Histogram(std::vector<float>* histogram)
 			}
 		}
 	}
+	
+	for(int i = 0; i < bins; i++)
+	{
+		(*histogram)[i] += (*histogram)[i] / maxBinCount;
+	}
 }

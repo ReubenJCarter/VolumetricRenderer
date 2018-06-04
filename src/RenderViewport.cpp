@@ -190,7 +190,7 @@ void RenderViewport::ImportDicomFileSequence(QStringList fileNames)
 	update();
 }
 
-void RenderViewport::ImportTIFFFileSequence(QStringList fileNames)
+void RenderViewport::ImportTIFFFileSequence(QStringList fileNames, std::vector<float>* histogram)
 {
 	std::vector<std::string> files;
 	for(int i = 0; i < fileNames.size(); i++)
@@ -209,7 +209,14 @@ void RenderViewport::ImportTIFFFileSequence(QStringList fileNames)
 	IntensityImage.Median2D();
 	textureVolume->Allocate(image3D.Width(), image3D.Height(), image3D.Depth(), false);
 	textureVolume->LoadData(IntensityImage.Data());
-	
+	IntensityImage.Histogram(&textureVolumeHistogram); 
+	if(histogram != NULL)
+	{		
+		for(int i = 0; i < textureVolumeHistogram.size(); i++)
+		{
+			(*histogram)[i] = textureVolumeHistogram[i]; 
+		}
+	}
 	
 	Image3D gradient3D;
 	gradient3D.Allocate(image3D.Width(), image3D.Height(), image3D.Depth(), 3);

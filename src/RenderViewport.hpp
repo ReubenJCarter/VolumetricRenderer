@@ -45,6 +45,7 @@ class RenderViewport: public QOpenGLWidget
 		TextureCube* textureEnvMap; 
 		Texture1D* textureLUT; 
 		AxisObject* axisObject;
+		std::vector<float> textureVolumeHistogram;
 		
 		RenderViewport();
 		
@@ -52,7 +53,7 @@ class RenderViewport: public QOpenGLWidget
 		void EnableDisableAxis(bool en);
 		void ImportDicomFile(QString fileName);
 		void ImportDicomFileSequence(QStringList fileNames);
-		void ImportTIFFFileSequence(QStringList fileNames);
+		void ImportTIFFFileSequence(QStringList fileNames, std::vector<float>* histogram=NULL);
 		void LoadLUT(float* buffer, int sizeLUT);
 		void LoadDefaultEnvMap();
 		void ChooseRenderer(RENDER_TYPE rt);

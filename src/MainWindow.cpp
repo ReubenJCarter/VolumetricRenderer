@@ -26,7 +26,7 @@ MainWindow::MainWindow()
 	QObject::connect(tiffSequenceAction, &QAction::triggered, [this]()
 	{
 		QStringList fileNames = QFileDialog::getOpenFileNames(this, tr("Open Image"), "", tr("types of Files(*)"));
-		renderViewport.ImportTIFFFileSequence(fileNames);
+		renderViewport.ImportTIFFFileSequence(fileNames, &(controlPanel.imageSettings->sampleMapping->histogram->data));
 		std::cout << "Import Sequence" << std::endl;
 	});
 	

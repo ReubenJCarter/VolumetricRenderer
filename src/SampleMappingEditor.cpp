@@ -66,7 +66,7 @@ void SampleMappingHistogram::paint(QPainter *painter, const QStyleOptionGraphics
 	for(int i = 0; i < data.size(); i++)
 	{
 		int x = (double)i / ((double)data.size() - 1.0)  *  viewW;
-		int y = (double)data[i] / 255.0  *  viewH;
+		int y = (double)data[i]  *  viewH;
 		int W = (double)(i+1) / ((double)data.size() - 1.0)  *  viewW - x;
 		painter->drawRect(x, 0, (std::max)(W, 1), -y);
 	}
