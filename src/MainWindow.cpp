@@ -9,13 +9,24 @@ MainWindow::MainWindow()
 	fileMenu = menuBar()->addMenu("File");
 	saveAction = fileMenu->addAction("Save");
 	loadAction = fileMenu->addAction("Load");
-	importAction = fileMenu->addAction("Import");
+	importAction = fileMenu->addMenu("Import");
 	importSequenceAction = fileMenu->addMenu("Import Sequence");
+	
+	QAction* tiffAction = importAction->addAction("tiff");
 	QAction* dcmSqeuenceAction = importSequenceAction->addAction("dcm");
 	QAction* tiffSequenceAction = importSequenceAction->addAction("tiff");
+	
 	QObject::connect(saveAction, SIGNAL(triggered()), this, SLOT(Save()));
 	QObject::connect(loadAction, SIGNAL(triggered()), this, SLOT(Load()));
 	
+	
+	QObject::connect(tiffAction, &QAction::triggered, [this]()
+	{
+		QString fileName = QFileDialog::getOpenFileName(this, tr("Open Image"), "", tr("types of File(*)"));
+		renderViewport.ImportTIFFFile(fileName, &(controlPanel.imageSettings->sampleMapping->histogram->data));
+		std::cout << "Import tiff" << std::endl;
+		
+	});
 	
 	QObject::connect(dcmSqeuenceAction, &QAction::triggered, [this]()
 	{

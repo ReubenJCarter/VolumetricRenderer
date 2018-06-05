@@ -16,7 +16,7 @@ class MainWindow: public QMainWindow
 		QMenu* fileMenu;
 		QAction* saveAction;
 		QAction* loadAction;
-		QAction* importAction;
+		QMenu* importAction;
 		QMenu* importSequenceAction;
 		
 		MainWindow();

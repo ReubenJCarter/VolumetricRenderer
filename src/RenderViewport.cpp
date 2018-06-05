@@ -186,12 +186,27 @@ void RenderViewport::ImportDicomFileSequence(QStringList fileNames)
 	textureVolume->Allocate(image3D.Width(), image3D.Height(), image3D.Depth());
 	textureVolume->LoadData(image3D.Data());
 	
-	photonVolumeObject->ClearPhotonRender(windowWidth, windowHeight);
-	update();
+	Refresh();
 }
 
-void RenderViewport::ImportTIFFFile(QString fileNames, std::vector<float>* histogram)
+void RenderViewport::ImportTIFFFile(QString fileName, std::vector<float>* histogram)
 {
+	Image3D image3D;
+	bool loadGood = Image3DFromTIFFFile(&image3D, fileName.toStdString());
+	if(!loadGood)
+		return;
+	
+	LoadFromImage3D(image3D);
+	
+	if(histogram != NULL)
+	{		
+		histogram->resize(textureVolumeHistogram.size());
+		for(int i = 0; i < textureVolumeHistogram.size(); i++)
+		{
+			(*histogram)[i] = textureVolumeHistogram[i]; 
+			//std::cout << (*histogram)[i] << " "; 
+		}
+	}
 }
 
 void RenderViewport::ImportTIFFFileSequence(QStringList fileNames, std::vector<float>* histogram)
@@ -205,15 +220,8 @@ void RenderViewport::ImportTIFFFileSequence(QStringList fileNames, std::vector<f
 	if(!loadGood)
 		return;
 	
+	LoadFromImage3D(image3D);
 	
-	Image3D IntensityImage;
-	IntensityImage.Allocate(image3D.Width(), image3D.Height(), image3D.Depth(), 4); 
-	IntensityImage.Copy(image3D); 
-	//IntensityImage.Smooth();
-	IntensityImage.Median2D();
-	textureVolume->Allocate(image3D.Width(), image3D.Height(), image3D.Depth(), false);
-	textureVolume->LoadData(IntensityImage.Data());
-	IntensityImage.Histogram(&textureVolumeHistogram); 
 	if(histogram != NULL)
 	{		
 		histogram->resize(textureVolumeHistogram.size());
@@ -223,22 +231,33 @@ void RenderViewport::ImportTIFFFileSequence(QStringList fileNames, std::vector<f
 			//std::cout << (*histogram)[i] << " "; 
 		}
 	}
+}
+
+bool RenderViewport::LoadFromImage3D(Image3D& image3D)
+{
+	if(image3D.Width()  == 0 || image3D.Height()  == 0 || image3D.Depth()  == 0)
+		return false;
+	
+	Image3D IntensityImage;
+	IntensityImage.Allocate(image3D.Width(), image3D.Height(), image3D.Depth(), 4); 
+	IntensityImage.Copy(image3D); 
+	IntensityImage.Median2D();
+	textureVolume->Allocate(image3D.Width(), image3D.Height(), image3D.Depth(), false);
+	textureVolume->LoadData(IntensityImage.Data());
+	IntensityImage.Histogram(&textureVolumeHistogram); 
 	
 	Image3D gradient3D;
 	gradient3D.Allocate(image3D.Width(), image3D.Height(), image3D.Depth(), 3);
-	//image3D.Smooth(); 
-	image3D.Normalize();
-	image3D.Median();
-	//image3D.Median2D();
+	IntensityImage.Normalize();
 	
-	//gradient3D.CentralDifference(image3D);
-	gradient3D.Sobel(image3D);
+	gradient3D.Sobel(IntensityImage);
 	
 	textureGradient->Allocate(gradient3D.Width(), gradient3D.Height(), gradient3D.Depth(), false, 3);
 	textureGradient->LoadData(gradient3D.Data());
 	
-	photonVolumeObject->ClearPhotonRender(windowWidth, windowHeight);
-	update();
+	Refresh();
+	
+	return true; 
 }
 
 void RenderViewport::LoadLUT(float* buffer, int sizeLUT)
@@ -247,8 +266,7 @@ void RenderViewport::LoadLUT(float* buffer, int sizeLUT)
 		textureLUT->Allocate(sizeLUT);
 	textureLUT->LoadData(buffer);
 	
-	photonVolumeObject->ClearPhotonRender(windowWidth, windowHeight);
-	update();
+	Refresh();
 }
 
 void RenderViewport::LoadDefaultEnvMap()
@@ -346,8 +364,7 @@ void RenderViewport::LoadDefaultEnvMap()
 	textureEnvMap->LoadDataZPos(posZData);
 	textureEnvMap->LoadDataZNeg(negZData);
 	
-	photonVolumeObject->ClearPhotonRender(windowWidth, windowHeight);
-	update();
+	Refresh();
 }
 
 void RenderViewport::ChooseRenderer(RENDER_TYPE rt)
@@ -372,8 +389,7 @@ void RenderViewport::ChooseRenderer(RENDER_TYPE rt)
 		photonVolumeObject->SetVisible(true); 
 	}
 	
-	photonVolumeObject->ClearPhotonRender(windowWidth, windowHeight);
-	update();
+	Refresh();
 }
 
 void RenderViewport::SetGradientThreshold(float threshold)
@@ -381,8 +397,7 @@ void RenderViewport::SetGradientThreshold(float threshold)
 	rayVolumeObject->SetGradientThreshold(threshold);
 	photonVolumeObject->SetGradientThreshold(threshold);
 	
-	photonVolumeObject->ClearPhotonRender(windowWidth, windowHeight);
-	update();
+	Refresh();
 }
 
 void RenderViewport::SetBackFaceCulling(bool cull)
@@ -390,6 +405,11 @@ void RenderViewport::SetBackFaceCulling(bool cull)
 	rayVolumeObject->SetBackFaceCulling(cull);
 	photonVolumeObject->SetBackFaceCulling(cull);
 	
+	Refresh();
+}
+
+void RenderViewport::Refresh()
+{
 	photonVolumeObject->ClearPhotonRender(windowWidth, windowHeight);
 	update();
 }

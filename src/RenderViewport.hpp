@@ -3,6 +3,7 @@
 
 #include "Common.hpp"
 
+#include "Image3D.hpp"
 #include "Renderer/CameraObject.hpp"
 #include "Renderer/TextureVolumeObject.hpp"
 #include "Renderer/RayVolumeObject.hpp"
@@ -53,11 +54,13 @@ class RenderViewport: public QOpenGLWidget
 		void EnableDisableAxis(bool en);
 		void ImportDicomFile(QString fileName);
 		void ImportDicomFileSequence(QStringList fileNames);
-		void ImportTIFFFile(QString fileNames, std::vector<float>* histogram=NULL);
+		void ImportTIFFFile(QString fileName, std::vector<float>* histogram=NULL);
 		void ImportTIFFFileSequence(QStringList fileNames, std::vector<float>* histogram=NULL);
+		bool LoadFromImage3D(Image3D& image3D);
 		void LoadLUT(float* buffer, int sizeLUT);
 		void LoadDefaultEnvMap();
 		void ChooseRenderer(RENDER_TYPE rt);
 		void SetGradientThreshold(float threshold);
 		void SetBackFaceCulling(bool cull); 
+		void Refresh();
 };

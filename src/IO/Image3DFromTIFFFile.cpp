@@ -60,3 +60,9 @@ bool Image3DFromTIFFFileSequence(Image3D* image, std::vector<std::string> fileNa
 	
 	return true; 
 }
+
+
+bool Image3DFromTIFFFile(Image3D* image, std::string fileName)
+{
+	return false; 
+}
