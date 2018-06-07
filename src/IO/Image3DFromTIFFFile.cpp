@@ -128,7 +128,11 @@ bool Image3DFromTIFFFile(Image3D* image, std::string fileName)
 	while(TIFFReadDirectory(tif))
 	{
 		unsigned char* imageData = (unsigned char*)image->Data() + width * height * 4 * i;
+		
 		TIFFReadRGBAImage(tif, width, height, (uint32_t*)imageData, 0);
+		for(int k = 0; k < width * height; k++)
+			std::cout << (int)(imageData[k * 4 + 0]) << " " << (int)(imageData[k * 4 + 1]) << " " << (int)(imageData[k * 4 + 2]) << " " << (int)(imageData[k * 4 + 3]) << std::endl; 
+		
 		i++;
 	}
 	

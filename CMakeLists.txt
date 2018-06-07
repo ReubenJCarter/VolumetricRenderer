@@ -46,6 +46,14 @@ set(LIBPNG_BIN_DIR ${LIBPNG_ROOT_DIR}/bin)
 include_directories(${LIBPNG_INC_DIR})
 link_directories(${LIBPNG_LIB_DIR})
 
+#devil
+set(DEVIL_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ext/devil CACHE PATH "Path to Devil")
+set(DEVIL_INC_DIR ${DEVIL_ROOT_DIR}/include)
+set(DEVIL_LIB_DIR ${DEVIL_ROOT_DIR}/lib/x64/Release)
+set(DEVIL_BIN_DIR ${DEVIL_ROOT_DIR}/bin)
+include_directories(${DEVIL_INC_DIR})
+link_directories(${DEVIL_LIB_DIR})
+
 #opencv
 set(OPENCV_ROOT_DIR C:/opencv/build CACHE PATH "Path to opencv")
 set(OPENCV_INC_DIR ${OPENCV_ROOT_DIR}/include)

@@ -199,7 +199,7 @@ void RenderViewport::ImportTIFFFile(QString fileName, std::vector<float>* histog
 	LoadFromImage3D(image3D);
 	
 	if(histogram != NULL)
-	{		
+	{
 		histogram->resize(textureVolumeHistogram.size());
 		for(int i = 0; i < textureVolumeHistogram.size(); i++)
 		{
