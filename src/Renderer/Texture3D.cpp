@@ -17,7 +17,7 @@ Texture3D::Texture3D()
 	channels = 4;
 }
 
-void Texture3D::Allocate(uint64_t w, uint64_t h, uint64_t d, bool compressed, int chan)
+void Texture3D::Allocate(uint64_t w, uint64_t h, uint64_t d, bool compressed, int chan, int bytesPerSample)
 {
 	width = w;
 	height = h;
@@ -31,7 +31,7 @@ void Texture3D::Allocate(uint64_t w, uint64_t h, uint64_t d, bool compressed, in
 	int internalFormats[] = {GL_COMPRESSED_RED, GL_COMPRESSED_RG, GL_COMPRESSED_RGB, GL_COMPRESSED_RGBA, GL_R8, GL_RG8, GL_RGB8, GL_RGBA8}; 
 	int dataFormats[] = {GL_RED, GL_RG, GL_RGB, GL_RGBA}; 
 	
-	int internalFormat = compressed ? internalFormats[chan-1] : internalFormats[chan-1 + 4];	
+	int internalFormat = compressed ? internalFormats[chan-1] : internalFormats[chan-1 + 4];
 	int dataFormat = dataFormats[chan-1]; 
 	
 	ogl->glTexImage3D(GL_TEXTURE_3D, 0, internalFormat, width, height, depth, 0, dataFormat, GL_UNSIGNED_BYTE, NULL);

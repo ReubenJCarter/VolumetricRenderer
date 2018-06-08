@@ -8,6 +8,7 @@
 #include "IO/Image3DFromDicomFile.hpp"
 #include "IO/Image3DFromTIFFFile.hpp"
 #include "IO/Image3DFromPNGFile.hpp"
+#include "IO/Image3DFromDevilFile.hpp"
 
 
 RenderViewport::RenderViewport()

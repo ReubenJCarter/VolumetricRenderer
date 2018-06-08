@@ -15,7 +15,7 @@ class Texture3D
 		
 	public:
 		Texture3D();
-		void Allocate(uint64_t w, uint64_t h, uint64_t d, bool compressed=true, int chan=4);
+		void Allocate(uint64_t w, uint64_t h, uint64_t d, bool compressed=true, int chan=4, int bytesPerSample=1);
 		void Destroy();
 		void LoadData(void* buffer);
 		void LoadDataSlice(void* buffer, uint64_t Z);
