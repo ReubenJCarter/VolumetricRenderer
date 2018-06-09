@@ -70,12 +70,12 @@ bool Image3DFromDevilFileSequence(Image3D* image, std::vector<std::string> fileN
 		bool loadedImageOK = ilLoadImage(fileNames[i].c_str());
 		if (loadedImageOK) 
 		{
-			unsigned char* imageData = (unsigned char*)image->Data() + width * height * 2 * i;
+			uint16_t* imageData = (uint16_t*)image->Data() + width * height * i;
 			ilConvertImage(IL_LUMINANCE, IL_SHORT); 
-			uint8_t* dataPtr = ilGetData();
-			for(unsigned int i = 0; i < width * height * 2; i++)
+			uint16_t* dataPtr = (uint16_t*)ilGetData();
+			for(unsigned int i = 0; i < width * height; i++)
 			{
-				((uint8_t*)imageData)[i] = dataPtr[i];
+				imageData[i] = dataPtr[i];
 			}
 			
 		}
@@ -134,10 +134,10 @@ bool Image3DFromDevilFile(Image3D* image, std::string fileName)
 	//Allocate Image
 	image->Allocate(width, height, depth, 2);
 	
-	unsigned char* imageData = (unsigned char*)image->Data(); 
+	uint16_t* imageData = (uint16_t*)image->Data(); 
 	ilConvertImage(IL_LUMINANCE, IL_SHORT); 
-	uint8_t* dataPtr = ilGetData();
-	for(int k = 0; k < width * height * depth * 2; k++)
+	uint16_t* dataPtr = (uint16_t*)ilGetData();
+	for(int k = 0; k < width * height * depth; k++)
 	{
 		imageData[k] = dataPtr[k];
 	}	

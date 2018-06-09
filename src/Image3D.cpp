@@ -79,6 +79,8 @@ void Image3D::Copy(Image3D& inImg)
 
 void Image3D::Smooth2D()
 {
+	if(pixelSize == 1)//8 bit monochrome images
+	{
 	for(uint64_t z = 0; z < depth; z++)
 	{
 		for(uint64_t y = 0; y < height; y++)
@@ -112,16 +114,93 @@ void Image3D::Smooth2D()
 				
 				
 				((unsigned char*)data)[(z * width * height + y * width + x) * pixelSize + 0] = running / 27;
-				((unsigned char*)data)[(z * width * height + y * width + x) * pixelSize + 1] = running / 27;
-				((unsigned char*)data)[(z * width * height + y * width + x) * pixelSize + 2] = running / 27;
-				((unsigned char*)data)[(z * width * height + y * width + x) * pixelSize + 3] = running / 27;
+				
 			}
 		}
+	}
+	}
+	else if(pixelSize == 2)//16 bit monochrome images
+	{
+	for(uint64_t z = 0; z < depth; z++)
+	{
+		for(uint64_t y = 0; y < height; y++)
+		{
+			for(uint64_t x = 0; x < width; x++)
+			{
+				int64_t x0 = x+1;
+				int64_t x1 = x-1;
+				int64_t y0 = y+1;
+				int64_t y1 = y-1;
+				
+				
+				int running = 0; 
+				
+				if(x0 < 0 || x0 >= width) x0 = x;
+				if(x1 < 0 || x1 >= width) x1 = x;
+				if(y0 < 0 || y0 >= height) y0 = y;
+				if(y1 < 0 || y1 >= height) y1 = y;
+					
+								
+				
+				running += ((uint16_t*)data)[(z * width * height + y0 * width + x0)];
+				running += ((uint16_t*)data)[(z * width * height + y0 * width + x)];
+				running += ((uint16_t*)data)[(z * width * height + y0 * width + x1)];
+				running += ((uint16_t*)data)[(z * width * height + y * width + x0)];
+				running += ((uint16_t*)data)[(z * width * height + y * width + x)];
+				running += ((uint16_t*)data)[(z * width * height + y * width + x1)];
+				running += ((uint16_t*)data)[(z * width * height + y1 * width + x0)];
+				running += ((uint16_t*)data)[(z * width * height + y1 * width + x)];
+				running += ((uint16_t*)data)[(z * width * height + y1 * width + x1)];
+				
+				
+				((uint16_t*)data)[(z * width * height + y * width + x)] = running / 27;
+			}
+		}
+	}	
 	}
 }
 
 void Image3D::Median2D()
 {
+	if(pixelSize == 1)//8 bit monochrome images
+	{
+	std::vector<int> vals(9); 
+	for(uint64_t z = 0; z < depth; z++)
+	{
+		for(uint64_t y = 0; y < height; y++)
+		{
+			for(uint64_t x = 0; x < width; x++)
+			{
+				int64_t x0 = x+1;
+				int64_t x1 = x-1;
+				int64_t y0 = y+1;
+				int64_t y1 = y-1;
+				
+				if(x0 < 0 || x0 >= width) x0 = x;
+				if(x1 < 0 || x1 >= width) x1 = x;
+				if(y0 < 0 || y0 >= height) y0 = y;
+				if(y1 < 0 || y1 >= height) y1 = y;
+				
+				vals[0] = ((unsigned char*)data)[(z * width * height + y0 * width + x0) * pixelSize];
+				vals[1] = ((unsigned char*)data)[(z * width * height + y0 * width + x) * pixelSize];
+				vals[2] = ((unsigned char*)data)[(z * width * height + y0 * width + x1) * pixelSize];
+				vals[3] = ((unsigned char*)data)[(z * width * height + y * width + x0) * pixelSize];
+				vals[4] = ((unsigned char*)data)[(z * width * height + y * width + x) * pixelSize];
+				vals[5] = ((unsigned char*)data)[(z * width * height + y * width + x1) * pixelSize];
+				vals[6] = ((unsigned char*)data)[(z * width * height + y1 * width + x0) * pixelSize];
+				vals[7] = ((unsigned char*)data)[(z * width * height + y1 * width + x) * pixelSize];
+				vals[8] = ((unsigned char*)data)[(z * width * height + y1 * width + x1) * pixelSize];
+				
+				std::nth_element(vals.begin(), vals.begin() + vals.size()/2, vals.end()); 
+				
+				((unsigned char*)data)[(z * width * height + y * width + x) * pixelSize + 0] = vals[vals.size()/2];
+				
+			}
+		}
+	}
+	}
+	if(pixelSize == 2)//16 bit monochrome images
+	{
 	std::vector<int> vals(9); 
 	for(uint64_t z = 0; z < depth; z++)
 	{
@@ -139,29 +218,30 @@ void Image3D::Median2D()
 				if(y0 < 0 || y0 >= height) y0 = y;
 				if(y1 < 0 || y1 >= height) y1 = y;				
 				
-				vals[0] = ((unsigned char*)data)[(z * width * height + y0 * width + x0) * pixelSize];
-				vals[1] = ((unsigned char*)data)[(z * width * height + y0 * width + x) * pixelSize];
-				vals[2] = ((unsigned char*)data)[(z * width * height + y0 * width + x1) * pixelSize];
-				vals[3] = ((unsigned char*)data)[(z * width * height + y * width + x0) * pixelSize];
-				vals[4] = ((unsigned char*)data)[(z * width * height + y * width + x) * pixelSize];
-				vals[5] = ((unsigned char*)data)[(z * width * height + y * width + x1) * pixelSize];
-				vals[6] = ((unsigned char*)data)[(z * width * height + y1 * width + x0) * pixelSize];
-				vals[7] = ((unsigned char*)data)[(z * width * height + y1 * width + x) * pixelSize];
-				vals[8] = ((unsigned char*)data)[(z * width * height + y1 * width + x1) * pixelSize];
+				vals[0] = ((uint16_t*)data)[(z * width * height + y0 * width + x0) ];
+				vals[1] = ((uint16_t*)data)[(z * width * height + y0 * width + x) ];
+				vals[2] = ((uint16_t*)data)[(z * width * height + y0 * width + x1) ];
+				vals[3] = ((uint16_t*)data)[(z * width * height + y * width + x0) ];
+				vals[4] = ((uint16_t*)data)[(z * width * height + y * width + x) ];
+				vals[5] = ((uint16_t*)data)[(z * width * height + y * width + x1) ];
+				vals[6] = ((uint16_t*)data)[(z * width * height + y1 * width + x0) ];
+				vals[7] = ((uint16_t*)data)[(z * width * height + y1 * width + x) ];
+				vals[8] = ((uint16_t*)data)[(z * width * height + y1 * width + x1) ];
 				
 				std::nth_element(vals.begin(), vals.begin() + vals.size()/2, vals.end()); 
 				
-				((unsigned char*)data)[(z * width * height + y * width + x) * pixelSize + 0] = vals[vals.size()/2];
-				((unsigned char*)data)[(z * width * height + y * width + x) * pixelSize + 1] = vals[vals.size()/2];
-				((unsigned char*)data)[(z * width * height + y * width + x) * pixelSize + 2] = vals[vals.size()/2];
-				((unsigned char*)data)[(z * width * height + y * width + x) * pixelSize + 3] = vals[vals.size()/2];
+				((uint16_t*)data)[(z * width * height + y * width + x)] = vals[vals.size()/2];
+				
 			}
 		}
+	}
 	}
 }
 
 void Image3D::Smooth()
 {
+	if(pixelSize == 1)//8 bit monochrome images
+	{
 	for(uint64_t z = 0; z < depth; z++)
 	{
 		for(uint64_t y = 0; y < height; y++)
@@ -215,16 +295,75 @@ void Image3D::Smooth()
 				running += ((unsigned char*)data)[(z1 * width * height + y1 * width + x1) * pixelSize];
 				
 				((unsigned char*)data)[(z * width * height + y * width + x) * pixelSize + 0] = running / 27;
-				((unsigned char*)data)[(z * width * height + y * width + x) * pixelSize + 1] = running / 27;
-				((unsigned char*)data)[(z * width * height + y * width + x) * pixelSize + 2] = running / 27;
-				((unsigned char*)data)[(z * width * height + y * width + x) * pixelSize + 3] = running / 27;
 			}
 		}
+	}
+	}
+	if(pixelSize == 2)//16 bit monochromeimages
+	{
+	for(uint64_t z = 0; z < depth; z++)
+	{
+		for(uint64_t y = 0; y < height; y++)
+		{
+			for(uint64_t x = 0; x < width; x++)
+			{
+				int64_t x0 = x+1;
+				int64_t x1 = x-1;
+				int64_t y0 = y+1;
+				int64_t y1 = y-1;
+				int64_t z0 = z+1;
+				int64_t z1 = z-1;
+				
+				
+				int running = 0; 
+				
+				if(x0 < 0 || x0 >= width) x0 = x;
+				if(x1 < 0 || x1 >= width) x1 = x;
+				if(y0 < 0 || y0 >= height) y0 = y;
+				if(y1 < 0 || y1 >= height) y1 = y;
+				if(z0 < 0 || z0 >= depth) z0 = z;
+				if(z1 < 0 || z1 >= depth) z1 = z;
+					
+								
+				running += ((uint16_t*)data)[(z0 * width * height + y0 * width + x0)];
+				running += ((uint16_t*)data)[(z0 * width * height + y0 * width + x)];
+				running += ((uint16_t*)data)[(z0 * width * height + y0 * width + x1)];
+				running += ((uint16_t*)data)[(z0 * width * height + y * width + x0)];
+				running += ((uint16_t*)data)[(z0 * width * height + y * width + x)];
+				running += ((uint16_t*)data)[(z0 * width * height + y * width + x1)];
+				running += ((uint16_t*)data)[(z0 * width * height + y1 * width + x0)];
+				running += ((uint16_t*)data)[(z0 * width * height + y1 * width + x) ];
+				running += ((uint16_t*)data)[(z0 * width * height + y1 * width + x1)];
+				running += ((uint16_t*)data)[(z * width * height + y0 * width + x0)];
+				running += ((uint16_t*)data)[(z * width * height + y0 * width + x)];
+				running += ((uint16_t*)data)[(z * width * height + y0 * width + x1)];
+				running += ((uint16_t*)data)[(z * width * height + y * width + x0)];
+				running += ((uint16_t*)data)[(z * width * height + y * width + x)];
+				running += ((uint16_t*)data)[(z * width * height + y * width + x1)];
+				running += ((uint16_t*)data)[(z * width * height + y1 * width + x0)];
+				running += ((uint16_t*)data)[(z * width * height + y1 * width + x)];
+				running += ((uint16_t*)data)[(z * width * height + y1 * width + x1)];
+				running += ((uint16_t*)data)[(z1 * width * height + y0 * width + x0)];
+				running += ((uint16_t*)data)[(z1 * width * height + y0 * width + x)];
+				running += ((uint16_t*)data)[(z1 * width * height + y0 * width + x1)];
+				running += ((uint16_t*)data)[(z1 * width * height + y * width + x0)];
+				running += ((uint16_t*)data)[(z1 * width * height + y * width + x)];
+				running += ((uint16_t*)data)[(z1 * width * height + y * width + x1)];
+				running += ((uint16_t*)data)[(z1 * width * height + y1 * width + x0) ];
+				running += ((uint16_t*)data)[(z1 * width * height + y1 * width + x)];
+				running += ((uint16_t*)data)[(z1 * width * height + y1 * width + x1)];
+				
+				((uint16_t*)data)[(z * width * height + y * width + x)] = running / 27;
+			}
+		}
+	}
 	}
 }
 
 void Image3D::Median()
 {
+	if(pixelSize == 1)//8 bit monochrome images
+	{
 	std::vector<int> vals(27); 
 	for(uint64_t z = 0; z < depth; z++)
 	{
@@ -281,16 +420,78 @@ void Image3D::Median()
 				std::nth_element(vals.begin(), vals.begin() + vals.size()/2, vals.end()); 
 				
 				((unsigned char*)data)[(z * width * height + y * width + x) * pixelSize + 0] = vals[vals.size()/2];
-				((unsigned char*)data)[(z * width * height + y * width + x) * pixelSize + 1] = vals[vals.size()/2];
-				((unsigned char*)data)[(z * width * height + y * width + x) * pixelSize + 2] = vals[vals.size()/2];
-				((unsigned char*)data)[(z * width * height + y * width + x) * pixelSize + 3] = vals[vals.size()/2];
 			}
 		}
+	}
+	}
+	if(pixelSize == 2)//16 bit monochromeimages
+	{
+	std::vector<int> vals(27); 
+	for(uint64_t z = 0; z < depth; z++)
+	{
+		for(uint64_t y = 0; y < height; y++)
+		{
+			for(uint64_t x = 0; x < width; x++)
+			{
+				int64_t x0 = x+1;
+				int64_t x1 = x-1;
+				int64_t y0 = y+1;
+				int64_t y1 = y-1;
+				int64_t z0 = z+1;
+				int64_t z1 = z-1;
+				
+				
+				
+				if(x0 < 0 || x0 >= width) x0 = x;
+				if(x1 < 0 || x1 >= width) x1 = x;
+				if(y0 < 0 || y0 >= height) y0 = y;
+				if(y1 < 0 || y1 >= height) y1 = y;
+				if(z0 < 0 || z0 >= depth) z0 = z;
+				if(z1 < 0 || z1 >= depth) z1 = z;
+					
+								
+				vals[0] = ((uint16_t*)data)[(z0 * width * height + y0 * width + x0)];
+				vals[1] = ((uint16_t*)data)[(z0 * width * height + y0 * width + x) ];
+				vals[2] = ((uint16_t*)data)[(z0 * width * height + y0 * width + x1) ];
+				vals[3] = ((uint16_t*)data)[(z0 * width * height + y * width + x0) ];
+				vals[4] = ((uint16_t*)data)[(z0 * width * height + y * width + x) ];
+				vals[5] = ((uint16_t*)data)[(z0 * width * height + y * width + x1) ];
+				vals[6] = ((uint16_t*)data)[(z0 * width * height + y1 * width + x0) ];
+				vals[7] = ((uint16_t*)data)[(z0 * width * height + y1 * width + x) ];
+				vals[8] = ((uint16_t*)data)[(z0 * width * height + y1 * width + x1) ];
+				vals[9] = ((uint16_t*)data)[(z * width * height + y0 * width + x0) ];
+				vals[10] = ((uint16_t*)data)[(z * width * height + y0 * width + x) ];
+				vals[11] = ((uint16_t*)data)[(z * width * height + y0 * width + x1) ];
+				vals[12] = ((uint16_t*)data)[(z * width * height + y * width + x0) ];
+				vals[13] = ((uint16_t*)data)[(z * width * height + y * width + x) ];
+				vals[14] = ((uint16_t*)data)[(z * width * height + y * width + x1) ];
+				vals[15] = ((uint16_t*)data)[(z * width * height + y1 * width + x0) ];
+				vals[16] = ((uint16_t*)data)[(z * width * height + y1 * width + x) ];
+				vals[17] = ((uint16_t*)data)[(z * width * height + y1 * width + x1) ];
+				vals[18] = ((uint16_t*)data)[(z1 * width * height + y0 * width + x0) ];
+				vals[19] = ((uint16_t*)data)[(z1 * width * height + y0 * width + x) ];
+				vals[20] = ((uint16_t*)data)[(z1 * width * height + y0 * width + x1) ];
+				vals[21] = ((uint16_t*)data)[(z1 * width * height + y * width + x0) ];
+				vals[22] = ((uint16_t*)data)[(z1 * width * height + y * width + x) ];
+				vals[23] = ((uint16_t*)data)[(z1 * width * height + y * width + x1) ];
+				vals[24] = ((uint16_t*)data)[(z1 * width * height + y1 * width + x0) ];
+				vals[25] = ((uint16_t*)data)[(z1 * width * height + y1 * width + x) ];
+				vals[26] = ((uint16_t*)data)[(z1 * width * height + y1 * width + x1) ];
+				
+				
+				std::nth_element(vals.begin(), vals.begin() + vals.size()/2, vals.end()); 
+				
+				((uint16_t*)data)[(z * width * height + y * width + x)] = vals[vals.size()/2];
+			}
+		}
+	}
 	}
 }
 
 void Image3D::CentralDifference(Image3D& inImg)
 {
+	if(inImg.pixelSize == 1)//8 bit monochrome images
+	{
 	for(uint64_t z = 0; z < depth; z++)
 	{
 		for(uint64_t y = 0; y < height; y++)
@@ -338,11 +539,64 @@ void Image3D::CentralDifference(Image3D& inImg)
 			}
 		}
 	}
+	}
+	if(inImg.pixelSize == 2)//16 bit monochromeimages
+	{
+	for(uint64_t z = 0; z < depth; z++)
+	{
+		for(uint64_t y = 0; y < height; y++)
+		{
+			for(uint64_t x = 0; x < width; x++)
+			{
+				int64_t x0 = x+1;
+				int64_t x1 = x-1;
+				int64_t y0 = y+1;
+				int64_t y1 = y-1;
+				int64_t z0 = z+1;
+				int64_t z1 = z-1;
+				
+				uint16_t* indata = (uint16_t*)inImg.Data();
+				
+				int dx0;
+				int dx1;
+				int dy0;
+				int dy1;
+				int dz0;
+				int dz1; 
+				
+				if(x0 < 0 || x0 >= width) x0 = x;
+				if(x1 < 0 || x1 >= width) x1 = x;
+				if(y0 < 0 || y0 >= height) y0 = y;
+				if(y1 < 0 || y1 >= height) y1 = y;
+				if(z0 < 0 || z0 >= depth) z0 = z;
+				if(z1 < 0 || z1 >= depth) z1 = z;
+					
+				dx0 = indata[(z * width * height + y * width + x0)];
+				dx1 = indata[(z * width * height + y * width + x1)];
+				dy0 = indata[(z * width * height + y0 * width + x)];
+				dy1 = indata[(z * width * height + y1 * width + x)];
+				dz0 = indata[(z0 * width * height + y * width + x)];
+				dz1 = indata[(z1 * width * height + y * width + x)];
+				
+				int gX = ((dx1 - dx0) + 65535) / 2;
+				int gY = ((dy1 - dy0) + 65535) / 2; 
+				int gZ = ((dz1 - dz0) + 65535) / 2;
+				
+				
+				((unsigned char*)data)[(z * width * height + y * width + x) * pixelSize + 0] = gX * (255.0 / 65535.0);
+				((unsigned char*)data)[(z * width * height + y * width + x) * pixelSize + 1] = gY * (255.0 / 65535.0);
+				((unsigned char*)data)[(z * width * height + y * width + x) * pixelSize + 2] = gZ * (255.0 / 65535.0);
+			}
+		}
+	}	
+	}
 	
 }
 
 void Image3D::Sobel(Image3D& inImg)
 {
+	if(inImg.pixelSize == 1)//8 bit monochrome images
+	{
 	unsigned char* d = (unsigned char*)inImg.data;
 	
 	std::vector<int> vals(27); 
@@ -446,10 +700,124 @@ void Image3D::Sobel(Image3D& inImg)
 			}
 		}
 	}
+	}
+	if(inImg.pixelSize == 2)//16 bit monochromeimages
+	{
+	uint16_t* d = (uint16_t*)inImg.data;
+	
+	std::vector<int> vals(27); 
+	for(uint64_t z = 0; z < depth; z++)
+	{
+		for(uint64_t y = 0; y < height; y++)
+		{
+			for(uint64_t x = 0; x < width; x++)
+			{
+				
+				int64_t x0 = x+1;
+				int64_t x1 = x-1;
+				int64_t y0 = y+1;
+				int64_t y1 = y-1;
+				int64_t z0 = z+1;
+				int64_t z1 = z-1;
+				
+				
+				if(x0 < 0 || x0 >= width) x0 = x;
+				if(x1 < 0 || x1 >= width) x1 = x;
+				if(y0 < 0 || y0 >= height) y0 = y;
+				if(y1 < 0 || y1 >= height) y1 = y;
+				if(z0 < 0 || z0 >= depth) z0 = z;
+				if(z1 < 0 || z1 >= depth) z1 = z;
+					
+					
+				
+					
+				//xy plane				z0
+				vals[0] = d[(z0 * width * height + y0 * width + x0)];
+				vals[1] = d[(z0 * width * height + y0 * width + x) ];
+				vals[2] = d[(z0 * width * height + y0 * width + x1) ];
+				vals[3] = d[(z0 * width * height + y * width + x0) ];
+				vals[4] = d[(z0 * width * height + y * width + x) ];
+				vals[5] = d[(z0 * width * height + y * width + x1) ];
+				vals[6] = d[(z0 * width * height + y1 * width + x0) ];
+				vals[7] = d[(z0 * width * height + y1 * width + x) ];
+				vals[8] = d[(z0 * width * height + y1 * width + x1) ];
+				
+				//xy plane     z1
+				vals[9] = d[(z * width * height + y0 * width + x0) ];
+				vals[10] = d[(z * width * height + y0 * width + x) ];
+				vals[11] = d[(z * width * height + y0 * width + x1) ];
+				vals[12] = d[(z * width * height + y * width + x0) ];
+				vals[13] = d[(z * width * height + y * width + x) ];
+				vals[14] = d[(z * width * height + y * width + x1) ];
+				vals[15] = d[(z * width * height + y1 * width + x0) ];
+				vals[16] = d[(z * width * height + y1 * width + x) ];
+				vals[17] = d[(z * width * height + y1 * width + x1) ];
+				
+				//xy plane     z2
+				vals[18] = d[(z1 * width * height + y0 * width + x0) ];
+				vals[19] = d[(z1 * width * height + y0 * width + x) ];
+				vals[20] = d[(z1 * width * height + y0 * width + x1) ];
+				vals[21] = d[(z1 * width * height + y * width + x0) ];
+				vals[22] = d[(z1 * width * height + y * width + x) ];
+				vals[23] = d[(z1 * width * height + y * width + x1) ];
+				vals[24] = d[(z1 * width * height + y1 * width + x0) ];
+				vals[25] = d[(z1 * width * height + y1 * width + x) ];
+				vals[26] = d[(z1 * width * height + y1 * width + x1) ];
+				
+				
+				
+				double gradZ =(vals[0] * -1.0 + vals[1] * -3.0 + vals[2] * -1.0 +  
+							   vals[3] * -3.0 + vals[4] * -6.0 + vals[5] * -3.0 +  
+							   vals[6] * -1.0 + vals[7] * -3.0 + vals[8] * -1.0 + 
+							   
+							   vals[18] * 1.0 + vals[19] * 3.0 + vals[20] * 1.0 +  
+							   vals[21] * 3.0 + vals[22] * 6.0 + vals[23] * 3.0 +  
+							   vals[24] * 1.0 + vals[25] * 3.0 + vals[26] * 1.0)/22.0;
+							   
+							   
+				double gradY =(vals[0] * -1.0 + vals[1] * -3.0 + vals[2] * -1.0 + 
+							   vals[3] * 0    + vals[4] * 0    + vals[5] * 0 + 
+							   vals[6] * 1.0  + vals[7] * 3.0  + vals[8] * 1.0 + 
+							   
+							   vals[9] * -3.0 + vals[10] * -6.0 + vals[11] * -3.0 + 
+							   vals[12] * 0   + vals[13] * 0    + vals[14] * 0 + 
+							   vals[15] * 3.0 + vals[16] * 6.0  + vals[17] * 3.0 + 
+							   
+							   vals[18] * -1.0 + vals[19] * -3.0 + vals[20] * -1.0 + 
+							   vals[21] * 0    + vals[22] * 0    + vals[23] * 0 + 
+							   vals[24] * 1.0  + vals[25] * 3.0  + vals[26] * 1.0)/22.0;
+							   
+				double gradX = (vals[0] * -1.0 + vals[1] * 0 + vals[2] * 1.0 + 
+							   vals[3] * -3.0  + vals[4] * 0 + vals[5] * 3.0 + 
+							   vals[6] * -1.0  + vals[7] * 0 + vals[8] * 1.0 + 
+							   
+							   vals[9] *  -3.0 + vals[10] * 0 + vals[11] * 3.0 + 
+							   vals[12] * -6.0 + vals[13] * 0 + vals[14] * 6.0 + 
+							   vals[15] * -3.0 + vals[16] * 0 + vals[17] * 3.0 + 
+							   
+							   vals[18] * -1.0 + vals[19] * 0 + vals[20] * 1.0 + 
+							   vals[21] * -3.0 + vals[22] * 0 + vals[23] * 3.0 + 
+							   vals[24] * -1.0 + vals[25] * 0 + vals[26] * 1.0)/22.0;
+				
+				
+				int gX = ((int)gradX + 65535) / 2;
+				int gY = ((int)gradY + 65535) / 2;
+				int gZ = ((int)gradZ + 65535) / 2;
+				
+				
+				((unsigned char*)data)[(z * width * height + y * width + x) * pixelSize + 0] = gX * (255.0 / 65535.0);
+				((unsigned char*)data)[(z * width * height + y * width + x) * pixelSize + 1] = gY * (255.0 / 65535.0) ;
+				((unsigned char*)data)[(z * width * height + y * width + x) * pixelSize + 2] = gZ * (255.0 / 65535.0);
+			}
+		}
+	}
+	}
 }
 
 void Image3D::Normalize()
 {
+	if(pixelSize == 1)//8 bit monochrome images
+	{
 	unsigned char minD = 255;
 	unsigned char maxD = 0; 
 	
@@ -474,7 +842,6 @@ void Image3D::Normalize()
 		}
 	}
 	
-	
 	double scaleFactor = 255.0 / (double)(maxD - minD); 
 	for(uint64_t z = 0; z < depth; z++)
 	{
@@ -487,16 +854,58 @@ void Image3D::Normalize()
 				unsigned char d = indata[(z * width * height + y * width + x) * pixelSize];
 				
 				((unsigned char*)data)[(z * width * height + y * width + x) * pixelSize + 0] = (d - minD) * scaleFactor;
-				((unsigned char*)data)[(z * width * height + y * width + x) * pixelSize + 1] = (d - minD) * scaleFactor;
-				((unsigned char*)data)[(z * width * height + y * width + x) * pixelSize + 2] = (d - minD) * scaleFactor;
-				((unsigned char*)data)[(z * width * height + y * width + x) * pixelSize + 3] = (d - minD) * scaleFactor;
 			}
 		}
+	}
+	}
+	if(pixelSize == 2)//16 bit monochromeimages
+	{
+	uint16_t minD = 65535;
+	uint16_t maxD = 0; 
+	
+	for(uint64_t z = 0; z < depth; z++)
+	{
+		for(uint64_t y = 0; y < height; y++)
+		{
+			for(uint64_t x = 0; x < width; x++)
+			{
+				
+				uint16_t* indata = (uint16_t*)Data();
+				
+				uint16_t d = indata[(z * width * height + y * width + x)];
+				
+				if(d < minD )
+					minD = d;
+				
+				if(d > maxD)
+					maxD = d; 
+			
+			}
+		}
+	}
+	
+	double scaleFactor = 65535.0 / (double)(maxD - minD); 
+	for(uint64_t z = 0; z < depth; z++)
+	{
+		for(uint64_t y = 0; y < height; y++)
+		{
+			for(uint64_t x = 0; x < width; x++)
+			{
+				uint16_t* indata = (uint16_t*)Data();
+				
+				uint16_t d = indata[(z * width * height + y * width + x)];
+				
+				((uint16_t*)data)[(z * width * height + y * width + x)] = (d - minD) * scaleFactor;
+			}
+		}
+	}
 	}
 }
 
 void Image3D::Histogram(std::vector<float>* histogram)
 {
+	if(pixelSize == 1)//8 bit monochrome images
+	{
 	int bins = 256; 
 	histogram->resize(bins, 0);
 	
@@ -519,5 +928,32 @@ void Image3D::Histogram(std::vector<float>* histogram)
 	for(int i = 0; i < bins; i++)
 	{
 		(*histogram)[i] = (*histogram)[i] / maxBinCount;
+	}
+	}
+	if(pixelSize == 2)//16 bit monochrome images
+	{
+	int bins = 65536; 
+	histogram->resize(bins, 0);
+	
+	float maxBinCount = 0;
+		
+	for(uint64_t z = 0; z < depth; z++)
+	{
+		for(uint64_t y = 0; y < height; y++)
+		{
+			for(uint64_t x = 0; x < width; x++)
+			{
+				uint16_t r = ((uint16_t*)data)[(z * width * height + y * width + x)];
+				(*histogram)[r] += 1.0f;
+				if((*histogram)[r] > maxBinCount && r != 0) 
+					maxBinCount = (*histogram)[r]; 
+			}
+		}
+	}
+	
+	for(int i = 0; i < bins; i++)
+	{
+		(*histogram)[i] = (*histogram)[i] / maxBinCount;
+	}
 	}
 }

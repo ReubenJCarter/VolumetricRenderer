@@ -193,7 +193,7 @@ void RenderViewport::ImportDicomFileSequence(QStringList fileNames)
 void RenderViewport::ImportTIFFFile(QString fileName, std::vector<float>* histogram)
 {
 	Image3D image3D;
-	bool loadGood = Image3DFromTIFFFile(&image3D, fileName.toStdString());
+	bool loadGood = Image3DFromDevilFile(&image3D, fileName.toStdString());
 	if(!loadGood)
 		return;
 	
@@ -217,7 +217,7 @@ void RenderViewport::ImportTIFFFileSequence(QStringList fileNames, std::vector<f
 		files.push_back(fileNames.at(i).toStdString());
 	
 	Image3D image3D;
-	bool loadGood = Image3DFromTIFFFileSequence(&image3D, files);
+	bool loadGood = Image3DFromDevilFileSequence(&image3D, files);
 	if(!loadGood)
 		return;
 	
@@ -240,10 +240,10 @@ bool RenderViewport::LoadFromImage3D(Image3D& image3D)
 		return false;
 	
 	Image3D IntensityImage;
-	IntensityImage.Allocate(image3D.Width(), image3D.Height(), image3D.Depth(), 4); 
+	IntensityImage.Allocate(image3D.Width(), image3D.Height(), image3D.Depth(), 2); 
 	IntensityImage.Copy(image3D); 
 	IntensityImage.Median2D();
-	textureVolume->Allocate(image3D.Width(), image3D.Height(), image3D.Depth(), false);
+	textureVolume->Allocate(image3D.Width(), image3D.Height(), image3D.Depth(), false, 1, 2);
 	textureVolume->LoadData(IntensityImage.Data());
 	IntensityImage.Histogram(&textureVolumeHistogram); 
 	
