@@ -12,10 +12,11 @@ class Texture3D
 		uint64_t height;
 		uint64_t depth;
 		int channels;
+		int bytesPerSample;
 		
 	public:
 		Texture3D();
-		void Allocate(uint64_t w, uint64_t h, uint64_t d, bool compressed=true, int chan=4, int bytesPerSample=1);
+		void Allocate(uint64_t w, uint64_t h, uint64_t d, bool compressed=true, int chan=4, int bps=1);
 		void Destroy();
 		void LoadData(void* buffer);
 		void LoadDataSlice(void* buffer, uint64_t Z);
