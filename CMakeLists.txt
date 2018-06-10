@@ -54,6 +54,14 @@ set(DEVIL_BIN_DIR ${DEVIL_ROOT_DIR}/bin)
 include_directories(${DEVIL_INC_DIR})
 link_directories(${DEVIL_LIB_DIR})
 
+#teem
+set(TEEM_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ext/teem/build/install CACHE PATH "Path to Teem")
+set(TEEM_INC_DIR ${TEEM_ROOT_DIR}/include)
+set(TEEM_LIB_DIR ${TEEM_ROOT_DIR}/lib)
+set(TEEM_BIN_DIR ${TEEM_ROOT_DIR}/bin)
+include_directories(${TEEM_INC_DIR})
+link_directories(${TEEM_LIB_DIR})
+
 #opencv
 set(OPENCV_ROOT_DIR C:/opencv/build CACHE PATH "Path to opencv")
 set(OPENCV_INC_DIR ${OPENCV_ROOT_DIR}/include)
@@ -104,6 +112,8 @@ install(FILES ${QT_BIN_DIR}/Qt5Core.dll
 			  ${DCMTK_BIN_DIR}/oflog.dll
 			  ${DCMTK_BIN_DIR}/ofstd.dll
 			  ${LIBPNG_BIN_DIR}/libpng16.dll
+			  ${DEVIL_BIN_DIR}/DevIL.dll
+			  ${TEEM_BIN_DIR}/teem.dll
 			  ${OPENCV_BIN_DIR}/opencv_world341d.dll
 			  ${OPENCV_BIN_DIR}/opencv_ffmpeg341_64.dll
 		DESTINATION bin

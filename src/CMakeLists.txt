@@ -27,6 +27,7 @@ set (volumetricRendererSrc
 		IO/Image3DFromTIFFFile.cpp
 		IO/Image3DFromPNGFile.cpp
 		IO/Image3DFromDevilFile.cpp
+		IO/Image3DFromNRRDFile.cpp
 )
 
 add_executable(VolumetricRenderer ${volumetricRendererSrc})
@@ -40,6 +41,8 @@ target_link_libraries(VolumetricRenderer tiff)
 target_link_libraries(VolumetricRenderer libpng16)
 
 target_link_libraries(VolumetricRenderer DevIL)
+
+target_link_libraries(VolumetricRenderer teem)
 
 target_link_libraries(VolumetricRenderer opencv_world341d)
 

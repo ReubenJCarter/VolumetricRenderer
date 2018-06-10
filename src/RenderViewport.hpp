@@ -55,7 +55,10 @@ class RenderViewport: public QOpenGLWidget
 		void ImportDicomFile(QString fileName);
 		void ImportDicomFileSequence(QStringList fileNames);
 		void ImportTIFFFile(QString fileName, std::vector<float>* histogram=NULL);
+		void ImportImageFile(QString fileName, std::vector<float>* histogram=NULL);
+		void ImportNRRDFile(QString fileName, std::vector<float>* histogram=NULL);
 		void ImportTIFFFileSequence(QStringList fileNames, std::vector<float>* histogram=NULL);
+		void ImportImageFileSequence(QStringList fileNames, std::vector<float>* histogram=NULL);
 		bool LoadFromImage3D(Image3D& image3D);
 		void LoadLUT(float* buffer, int sizeLUT);
 		void LoadDefaultEnvMap();

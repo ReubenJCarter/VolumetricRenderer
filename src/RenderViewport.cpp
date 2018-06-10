@@ -9,6 +9,7 @@
 #include "IO/Image3DFromTIFFFile.hpp"
 #include "IO/Image3DFromPNGFile.hpp"
 #include "IO/Image3DFromDevilFile.hpp"
+#include "IO/Image3DFromNRRDFile.hpp"
 
 
 RenderViewport::RenderViewport()
@@ -193,6 +194,26 @@ void RenderViewport::ImportDicomFileSequence(QStringList fileNames)
 void RenderViewport::ImportTIFFFile(QString fileName, std::vector<float>* histogram)
 {
 	Image3D image3D;
+	bool loadGood = Image3DFromTIFFFile(&image3D, fileName.toStdString());
+	if(!loadGood)
+		return;
+	
+	LoadFromImage3D(image3D);
+	
+	if(histogram != NULL)
+	{
+		histogram->resize(textureVolumeHistogram.size());
+		for(int i = 0; i < textureVolumeHistogram.size(); i++)
+		{
+			(*histogram)[i] = textureVolumeHistogram[i]; 
+			//std::cout << (*histogram)[i] << " "; 
+		}
+	}
+}
+
+void RenderViewport::ImportImageFile(QString fileName, std::vector<float>* histogram)
+{
+	Image3D image3D;
 	bool loadGood = Image3DFromDevilFile(&image3D, fileName.toStdString());
 	if(!loadGood)
 		return;
@@ -210,7 +231,51 @@ void RenderViewport::ImportTIFFFile(QString fileName, std::vector<float>* histog
 	}
 }
 
+void RenderViewport::ImportNRRDFile(QString fileName, std::vector<float>* histogram)
+{
+	Image3D image3D;
+	bool loadGood = Image3DFromNRRDFile(&image3D, fileName.toStdString());
+	if(!loadGood)
+		return;
+	
+	LoadFromImage3D(image3D);
+	
+	if(histogram != NULL)
+	{
+		histogram->resize(textureVolumeHistogram.size());
+		for(int i = 0; i < textureVolumeHistogram.size(); i++)
+		{
+			(*histogram)[i] = textureVolumeHistogram[i]; 
+			//std::cout << (*histogram)[i] << " "; 
+		}
+	}
+}
+
 void RenderViewport::ImportTIFFFileSequence(QStringList fileNames, std::vector<float>* histogram)
+{
+	std::vector<std::string> files;
+	for(int i = 0; i < fileNames.size(); i++)
+		files.push_back(fileNames.at(i).toStdString());
+	
+	Image3D image3D;
+	bool loadGood = Image3DFromTIFFFileSequence(&image3D, files);
+	if(!loadGood)
+		return;
+	
+	LoadFromImage3D(image3D);
+	
+	if(histogram != NULL)
+	{		
+		histogram->resize(textureVolumeHistogram.size());
+		for(int i = 0; i < textureVolumeHistogram.size(); i++)
+		{
+			(*histogram)[i] = textureVolumeHistogram[i]; 
+			//std::cout << (*histogram)[i] << " "; 
+		}
+	}
+}
+
+void RenderViewport::ImportImageFileSequence(QStringList fileNames, std::vector<float>* histogram)
 {
 	std::vector<std::string> files;
 	for(int i = 0; i < fileNames.size(); i++)

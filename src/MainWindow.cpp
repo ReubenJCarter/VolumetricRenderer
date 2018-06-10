@@ -13,8 +13,11 @@ MainWindow::MainWindow()
 	importSequenceAction = fileMenu->addMenu("Import Sequence");
 	
 	QAction* tiffAction = importAction->addAction("tiff");
+	QAction* imageAction = importAction->addAction("image");
+	QAction* nrrdAction = importAction->addAction("nrrd");
 	QAction* dcmSqeuenceAction = importSequenceAction->addAction("dcm");
 	QAction* tiffSequenceAction = importSequenceAction->addAction("tiff");
+	QAction* imageSequenceAction = importSequenceAction->addAction("image");
 	
 	QObject::connect(saveAction, SIGNAL(triggered()), this, SLOT(Save()));
 	QObject::connect(loadAction, SIGNAL(triggered()), this, SLOT(Load()));
@@ -28,6 +31,23 @@ MainWindow::MainWindow()
 		
 	});
 	
+	QObject::connect(nrrdAction, &QAction::triggered, [this]()
+	{
+		QString fileName = QFileDialog::getOpenFileName(this, tr("Open Image"), "", tr("types of File(*)"));
+		renderViewport.ImportNRRDFile(fileName, &(controlPanel.imageSettings->sampleMapping->histogram->data));
+		std::cout << "Import image" << std::endl;
+		
+	});
+	
+	QObject::connect(imageAction, &QAction::triggered, [this]()
+	{
+		QString fileName = QFileDialog::getOpenFileName(this, tr("Open Image"), "", tr("types of File(*)"));
+		renderViewport.ImportImageFile(fileName, &(controlPanel.imageSettings->sampleMapping->histogram->data));
+		std::cout << "Import image" << std::endl;
+		
+	});
+	
+	
 	QObject::connect(dcmSqeuenceAction, &QAction::triggered, [this]()
 	{
 		QStringList fileNames = QFileDialog::getOpenFileNames(this, tr("Open Image"), "", tr("types of Files(*)"));
@@ -38,6 +58,14 @@ MainWindow::MainWindow()
 	{
 		QStringList fileNames = QFileDialog::getOpenFileNames(this, tr("Open Image"), "", tr("types of Files(*)"));
 		renderViewport.ImportTIFFFileSequence(fileNames, &(controlPanel.imageSettings->sampleMapping->histogram->data));
+		//renderViewport.ImportTIFFFileSequence(fileNames, NULL);
+		std::cout << "Import Sequence" << std::endl;
+		
+	});
+	QObject::connect(imageSequenceAction, &QAction::triggered, [this]()
+	{
+		QStringList fileNames = QFileDialog::getOpenFileNames(this, tr("Open Image"), "", tr("types of Files(*)"));
+		renderViewport.ImportImageFileSequence(fileNames, &(controlPanel.imageSettings->sampleMapping->histogram->data));
 		//renderViewport.ImportTIFFFileSequence(fileNames, NULL);
 		std::cout << "Import Sequence" << std::endl;
 		
