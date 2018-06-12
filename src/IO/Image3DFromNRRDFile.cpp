@@ -31,7 +31,24 @@ bool Image3DFromNRRDFile(Image3D* image, std::string fileName)
 		depth = nin->axis[2].size;
 	
 	//load nrrd data into image3d
-	
+	if(nin->type == nrrdTypeChar || nin->type == nrrdTypeUChar)
+	{
+		image->Allocate(width, height, depth, 2);
+		uint16_t* imdata = (uint16_t*)image->Data(); 
+		for(uint64_t i = 0; i < width * height * depth; i++)
+		{
+			imdata[i] = ((uint8_t*)(nin->data))[i]; 
+		}
+	}
+	else if(nin->type == nrrdTypeShort || nin->type == nrrdTypeUShort)
+	{
+		image->Allocate(width, height, depth, 2);
+		uint16_t* imdata = (uint16_t*)image->Data(); 
+		for(uint64_t i = 0; i < width * height * depth; i++)
+		{
+			imdata[i] = ((uint16_t*)(nin->data))[i]; 
+		}
+	}
 	
 	//delete nrrd 
 	nrrdNuke(nin);
