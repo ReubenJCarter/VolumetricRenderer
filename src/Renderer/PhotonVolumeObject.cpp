@@ -180,6 +180,83 @@ vec4 FetchEnvMap(vec3 dir)
 	return texture(envMapTexture, dir);
 }
 
+
+
+
+
+//Cook Torrence 
+
+vec3 lerp(vec3 a, vec3 b, float w)
+{
+  return a + w * (b - a);
+}
+ 
+float saturate(float v)
+{
+	return clamp(v, 0.0f, 1.0f);
+}
+
+float chiGGX(float v)
+{
+    return v > 0.0f ? 1.0f : 0.0f;
+}
+
+float GGX_Distribution(vec3 n, vec3 h, float alpha)
+{
+    float NoH = dot(n,h);
+    float alpha2 = alpha * alpha;
+    float NoH2 = NoH * NoH;
+    float den = NoH2 * alpha2 + (1 - NoH2);
+    return (chiGGX(NoH) * alpha2) / ( PI * den * den );
+}
+
+float GGX_PartialGeometryTerm(vec3 v, vec3 n, vec3 h, float alpha)
+{
+	float VoH2 = clamp(dot(v,h), 0.0f, 1.0f);
+	float chi = chiGGX(VoH2 / clamp(dot(v,n), 0.0f, 1.0f));
+	VoH2 = VoH2 * VoH2;
+	float tan2 = ( 1 - VoH2 ) / VoH2;
+	return (chi * 2) / (1 + sqrt( 1 + alpha * alpha * tan2));
+}
+
+vec3 Fresnel_Schlick(vec3 halfVector, vec3 viewVector, vec3 F0)
+{
+  return F0 + (1.0f - F0) * pow( 1.0f - saturate(dot( halfVector, viewVector )), 5);
+}
+
+vec3 GGX_Specular(vec3 normal, vec3 viewVector, vec3 lightVector, float roughness, vec3 F0, out vec3 kS)
+{
+    float  NoV = saturate(dot(normal, viewVector));
+    float  NoL = saturate(dot(normal, lightVector));
+
+	// Calculate the half vector
+	vec3 halfVector = normalize(lightVector + viewVector);
+	float cosT = saturate(dot( lightVector, normal ));
+	
+	// Calculate fresnel
+	vec3 fresnel = Fresnel_Schlick(halfVector, viewVector, F0 );
+	
+	// Geometry term
+	float geometry = GGX_PartialGeometryTerm(viewVector, normal, halfVector, roughness) * GGX_PartialGeometryTerm(lightVector, normal, halfVector, roughness);
+
+	//Distribution term
+	float distribution = GGX_Distribution(normal, halfVector, roughness);
+	
+	// Accumulate the radiance
+	float denominator = saturate( 4.0f * ( NoV * NoL + 0.05f) );
+	vec3 radiance = geometry * fresnel * distribution * cosT / denominator;
+
+    // final return values
+	kS = fresnel;
+	kS = clamp(kS, vec3(0.0f), vec3(1.0f));
+	return radiance;
+}
+
+
+
+
+
+
 //main
 void main()
 {
