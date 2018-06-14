@@ -15,6 +15,7 @@ Texture3D::Texture3D()
 	height = 0;
 	depth = 0; 
 	channels = 4;
+	
 }
 
 void Texture3D::Allocate(uint64_t w, uint64_t h, uint64_t d, bool compressed, int chan, int bps)

@@ -198,7 +198,10 @@ void RenderViewport::ImportTIFFFile(QString fileName, std::vector<float>* histog
 	if(!loadGood)
 		return;
 	
-	LoadFromImage3D(image3D);
+	loadGood = LoadFromImage3D(image3D);
+	
+	if(!loadGood)
+		return;
 	
 	if(histogram != NULL)
 	{
@@ -218,7 +221,10 @@ void RenderViewport::ImportImageFile(QString fileName, std::vector<float>* histo
 	if(!loadGood)
 		return;
 	
-	LoadFromImage3D(image3D);
+	loadGood = LoadFromImage3D(image3D);
+	
+	if(!loadGood)
+		return;
 	
 	if(histogram != NULL)
 	{
@@ -238,8 +244,12 @@ void RenderViewport::ImportNRRDFile(QString fileName, std::vector<float>* histog
 	if(!loadGood)
 		return;
 	
-	LoadFromImage3D(image3D);
+	loadGood = LoadFromImage3D(image3D);
 	
+	if(!loadGood)
+		return;
+	
+	/*
 	if(histogram != NULL)
 	{
 		histogram->resize(textureVolumeHistogram.size());
@@ -249,6 +259,7 @@ void RenderViewport::ImportNRRDFile(QString fileName, std::vector<float>* histog
 			//std::cout << (*histogram)[i] << " "; 
 		}
 	}
+	*/
 }
 
 void RenderViewport::ImportTIFFFileSequence(QStringList fileNames, std::vector<float>* histogram)
@@ -262,7 +273,10 @@ void RenderViewport::ImportTIFFFileSequence(QStringList fileNames, std::vector<f
 	if(!loadGood)
 		return;
 	
-	LoadFromImage3D(image3D);
+	loadGood = LoadFromImage3D(image3D);
+
+	if(!loadGood)
+		return;
 	
 	if(histogram != NULL)
 	{		
@@ -286,7 +300,10 @@ void RenderViewport::ImportImageFileSequence(QStringList fileNames, std::vector<
 	if(!loadGood)
 		return;
 	
-	LoadFromImage3D(image3D);
+	loadGood = LoadFromImage3D(image3D);
+	
+	if(!loadGood)
+		return;
 	
 	if(histogram != NULL)
 	{		
@@ -302,22 +319,31 @@ void RenderViewport::ImportImageFileSequence(QStringList fileNames, std::vector<
 bool RenderViewport::LoadFromImage3D(Image3D& image3D)
 {
 	if(image3D.Width()  == 0 || image3D.Height()  == 0 || image3D.Depth()  == 0)
+	{
+		std::cout << "RenderViewport: Could not load image 3d into viewport" << std::endl; 
 		return false;
+	}
 	
+	std::cout << "RenderViewport: Building intensity image" << std::endl; 
 	Image3D IntensityImage;
 	IntensityImage.Allocate(image3D.Width(), image3D.Height(), image3D.Depth(), 2); 
 	IntensityImage.Copy(image3D); 
-	IntensityImage.Median2D();
+	
+	std::cout << "RenderViewport: Building intensity texture" << std::endl; 
 	textureVolume->Allocate(image3D.Width(), image3D.Height(), image3D.Depth(), false, 1, 2);
 	textureVolume->LoadData(IntensityImage.Data());
+	
+	std::cout << "RenderViewport: Building histogram" << std::endl; 
 	IntensityImage.Histogram(&textureVolumeHistogram); 
 	
+	std::cout << "RenderViewport: Building gradient image" << std::endl; 
 	Image3D gradient3D;
 	gradient3D.Allocate(image3D.Width(), image3D.Height(), image3D.Depth(), 3);
 	IntensityImage.Normalize();
-	
+	IntensityImage.Median2D();
 	gradient3D.Sobel(IntensityImage);
 	
+	std::cout << "RenderViewport: Building gradient texture" << std::endl; 
 	textureGradient->Allocate(gradient3D.Width(), gradient3D.Height(), gradient3D.Depth(), false, 3);
 	textureGradient->LoadData(gradient3D.Data());
 	
