@@ -38,6 +38,7 @@ bool Image3DFromNRRDFile(Image3D* image, std::string fileName)
 	//load nrrd data into image3d
 	if(nin->type == nrrdTypeChar || nin->type == nrrdTypeUChar)
 	{
+		std::cout << "Image3DFromNRRDFile: Data type is Char/uChar" << std::endl; 
 		image->Allocate(width, height, depth, 2);
 		uint16_t* imdata = (uint16_t*)image->Data(); 
 		for(uint64_t i = 0; i < width * height * depth; i++)
@@ -47,6 +48,7 @@ bool Image3DFromNRRDFile(Image3D* image, std::string fileName)
 	}
 	else if(nin->type == nrrdTypeShort || nin->type == nrrdTypeUShort)
 	{
+		std::cout << "Image3DFromNRRDFile: Data type is Short/uShort" << std::endl;
 		image->Allocate(width, height, depth, 2);
 		uint16_t* imdata = (uint16_t*)image->Data(); 
 		for(uint64_t i = 0; i < width * height * depth; i++)
