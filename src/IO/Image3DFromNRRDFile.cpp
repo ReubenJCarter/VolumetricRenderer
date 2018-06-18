@@ -46,14 +46,42 @@ bool Image3DFromNRRDFile(Image3D* image, std::string fileName)
 			imdata[i] = ((uint8_t*)(nin->data))[i] << 8; 
 		}
 	}
-	else if(nin->type == nrrdTypeShort || nin->type == nrrdTypeUShort)
+	else if(nin->type == nrrdTypeUShort)
 	{
-		std::cout << "Image3DFromNRRDFile: Data type is Short/uShort" << std::endl;
+		std::cout << "Image3DFromNRRDFile: Data type is UShort" << std::endl;
 		image->Allocate(width, height, depth, 2);
-		uint16_t* imdata = (uint16_t*)image->Data(); 
-		for(uint64_t i = 0; i < width * height * depth; i++)
+		uint16_t* imdata = (uint16_t*)image->Data();
+		uint64_t inx = 0; 
+		for(uint64_t k = 0; k < depth; k++)
 		{
-			imdata[i] = ((uint16_t*)(nin->data))[i]; 
+			for(uint64_t j = 0; j < height; j++)
+			{
+				
+				for(uint64_t i = 0; i < width; i++)
+				{
+					imdata[k * width * height + j * width + i] = ((uint16_t*)(nin->data))[inx]; 
+					inx++;
+				}
+			}
+		}
+	}
+	else if(nin->type == nrrdTypeShort)
+	{
+		std::cout << "Image3DFromNRRDFile: Data type is Short" << std::endl;
+		image->Allocate(width, height, depth, 2);
+		int16_t* imdata = (int16_t*)image->Data();
+		uint64_t inx = 0; 
+		for(uint64_t k = 0; k < depth; k++)
+		{
+			for(uint64_t j = 0; j < height; j++)
+			{
+				for(uint64_t i = 0; i < width; i++)
+				{
+					imdata[k * width * height + j * width + i] = (32767 + (int)((int16_t*)(nin->data))[inx]) / 2;
+					//std::cout << imdata[k * width * height + j * width + i] << std::endl; 
+					inx++;
+				}
+			}
 		}
 	}
 	else

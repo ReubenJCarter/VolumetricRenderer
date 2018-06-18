@@ -10,6 +10,8 @@ bool Image3DFromDevilFileSequence(Image3D* image, std::vector<std::string> fileN
 	if(!ILInited)
 	{
 		ilInit();
+		ilEnable(IL_ORIGIN_SET);
+		ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
 		ILInited = true;
 	}
 	
@@ -92,6 +94,8 @@ bool Image3DFromDevilFile(Image3D* image, std::string fileName)
 	if(!ILInited)
 	{
 		ilInit();
+		ilEnable(IL_ORIGIN_SET);
+		ilOriginFunc(IL_ORIGIN_LOWER_LEFT);
 		ILInited = true;
 	}
 	
