@@ -25,6 +25,8 @@ bool Image3DFromNRRDFile(Image3D* image, std::string fileName)
 	uint64_t height = 0;
 	uint64_t depth = 0;
 	
+	
+	
 	if(nin->dim > 0)
 		width = nin->axis[0].size;
 	if(nin->dim > 1)
@@ -32,6 +34,10 @@ bool Image3DFromNRRDFile(Image3D* image, std::string fileName)
 	if(nin->dim > 2)
 		depth = nin->axis[2].size;
 	
+	//find nearest power of 2 ceiling 
+	uint64_t widthP2 = pow(2, ceil(log(width)/log(2)));
+	uint64_t heightP2 = pow(2, ceil(log(height)/log(2)));
+	uint64_t depthP2 = pow(2, ceil(log(depth)/log(2)));
 	
 	std::cout << "Image3DFromNRRDFile: Loading image of size: " << width << " x " << height << " x " << depth << std::endl; 
 	
@@ -49,7 +55,7 @@ bool Image3DFromNRRDFile(Image3D* image, std::string fileName)
 	else if(nin->type == nrrdTypeUShort)
 	{
 		std::cout << "Image3DFromNRRDFile: Data type is UShort" << std::endl;
-		image->Allocate(width, height, depth, 2);
+		image->Allocate(widthP2, heightP2, depthP2, 2);
 		uint16_t* imdata = (uint16_t*)image->Data();
 		uint64_t inx = 0; 
 		for(uint64_t k = 0; k < depth; k++)
@@ -59,16 +65,17 @@ bool Image3DFromNRRDFile(Image3D* image, std::string fileName)
 				
 				for(uint64_t i = 0; i < width; i++)
 				{
-					imdata[k * width * height + j * width + i] = ((uint16_t*)(nin->data))[inx]; 
+					imdata[k * widthP2 * heightP2 + j * widthP2 + i] = ((uint16_t*)(nin->data))[inx]; 
 					inx++;
 				}
 			}
 		}
+		
 	}
 	else if(nin->type == nrrdTypeShort)
 	{
 		std::cout << "Image3DFromNRRDFile: Data type is Short" << std::endl;
-		image->Allocate(width, height, depth, 2);
+		image->Allocate(widthP2, heightP2, depthP2, 2);
 		int16_t* imdata = (int16_t*)image->Data();
 		uint64_t inx = 0; 
 		for(uint64_t k = 0; k < depth; k++)
@@ -77,12 +84,13 @@ bool Image3DFromNRRDFile(Image3D* image, std::string fileName)
 			{
 				for(uint64_t i = 0; i < width; i++)
 				{
-					imdata[k * width * height + j * width + i] = (32767 + (int)((int16_t*)(nin->data))[inx]) / 2;
+					imdata[k * widthP2 * heightP2 + j * widthP2 + i] = (32767 + (int)((int16_t*)(nin->data))[inx]) / 2;
 					//std::cout << imdata[k * width * height + j * width + i] << std::endl; 
 					inx++;
 				}
 			}
 		}
+					
 	}
 	else
 	{
