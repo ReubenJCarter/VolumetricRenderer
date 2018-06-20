@@ -9,7 +9,6 @@ set (volumetricRendererSrc
 		RenderViewport.cpp
 		TestGenerateVolume.cpp
 		SampleMappingEditor.cpp
-		ImageSettings.cpp
 		
 		Renderer/Texture3D.cpp
 		Renderer/TextureCube.cpp

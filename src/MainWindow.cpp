@@ -26,7 +26,7 @@ MainWindow::MainWindow()
 	QObject::connect(tiffAction, &QAction::triggered, [this]()
 	{
 		QString fileName = QFileDialog::getOpenFileName(this, tr("Open Image"), "", tr("types of File(*)"));
-		renderViewport.ImportTIFFFile(fileName, &(controlPanel.imageSettings->sampleMapping->histogram->data));
+		renderViewport.ImportTIFFFile(fileName, &(controlPanel.sampleMapping->histogram->data));
 		std::cout << "Import tiff" << std::endl;
 		
 	});
@@ -34,7 +34,7 @@ MainWindow::MainWindow()
 	QObject::connect(nrrdAction, &QAction::triggered, [this]()
 	{
 		QString fileName = QFileDialog::getOpenFileName(this, tr("Open Image"), "", tr("types of File(*)"));
-		renderViewport.ImportNRRDFile(fileName, &(controlPanel.imageSettings->sampleMapping->histogram->data));
+		renderViewport.ImportNRRDFile(fileName, &(controlPanel.sampleMapping->histogram->data));
 		std::cout << "Import image" << std::endl;
 		
 	});
@@ -42,7 +42,7 @@ MainWindow::MainWindow()
 	QObject::connect(imageAction, &QAction::triggered, [this]()
 	{
 		QString fileName = QFileDialog::getOpenFileName(this, tr("Open Image"), "", tr("types of File(*)"));
-		renderViewport.ImportImageFile(fileName, &(controlPanel.imageSettings->sampleMapping->histogram->data));
+		renderViewport.ImportImageFile(fileName, &(controlPanel.sampleMapping->histogram->data));
 		std::cout << "Import image" << std::endl;
 		
 	});
@@ -57,7 +57,7 @@ MainWindow::MainWindow()
 	QObject::connect(tiffSequenceAction, &QAction::triggered, [this]()
 	{
 		QStringList fileNames = QFileDialog::getOpenFileNames(this, tr("Open Image"), "", tr("types of Files(*)"));
-		renderViewport.ImportTIFFFileSequence(fileNames, &(controlPanel.imageSettings->sampleMapping->histogram->data));
+		renderViewport.ImportTIFFFileSequence(fileNames, &(controlPanel.sampleMapping->histogram->data));
 		//renderViewport.ImportTIFFFileSequence(fileNames, NULL);
 		std::cout << "Import Sequence" << std::endl;
 		
@@ -65,7 +65,7 @@ MainWindow::MainWindow()
 	QObject::connect(imageSequenceAction, &QAction::triggered, [this]()
 	{
 		QStringList fileNames = QFileDialog::getOpenFileNames(this, tr("Open Image"), "", tr("types of Files(*)"));
-		renderViewport.ImportImageFileSequence(fileNames, &(controlPanel.imageSettings->sampleMapping->histogram->data));
+		renderViewport.ImportImageFileSequence(fileNames, &(controlPanel.sampleMapping->histogram->data));
 		//renderViewport.ImportTIFFFileSequence(fileNames, NULL);
 		std::cout << "Import Sequence" << std::endl;
 		
@@ -103,21 +103,21 @@ MainWindow::MainWindow()
 		}
 	});
 	
-	QObject::connect(controlPanel.imageSettings->sampleMapping, &SampleMappingEditor::CurveChanged, [this]()
+	QObject::connect(controlPanel.sampleMapping, &SampleMappingEditor::CurveChanged, [this]()
 	{
 		int sizeLUT = 256; 
 		std::vector<float> bufferLUT(sizeLUT * 4);
-		controlPanel.imageSettings->sampleMapping->GetLUT(sizeLUT, &bufferLUT[0]);
+		controlPanel.sampleMapping->GetLUT(sizeLUT, &bufferLUT[0]);
 		renderViewport.LoadLUT(&bufferLUT[0], sizeLUT);
 		
 	});
 	
-	QObject::connect(controlPanel.imageSettings->chooserGradientThreshold, &ScalarChooser::valueChanged, [this](float value)
+	QObject::connect(controlPanel.chooserGradientThreshold, &ScalarChooser::valueChanged, [this](float value)
 	{
 		renderViewport.SetGradientThreshold(value);
 	});
 	
-	QObject::connect(controlPanel.imageSettings->checkBackFaceCulling, &QCheckBox::stateChanged, [this](int state)
+	QObject::connect(controlPanel.checkBackFaceCulling, &QCheckBox::stateChanged, [this](int state)
 	{
 		bool value = state == Qt::Checked; 
 		renderViewport.SetBackFaceCulling(value);

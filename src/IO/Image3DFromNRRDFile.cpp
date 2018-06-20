@@ -58,6 +58,10 @@ bool Image3DFromNRRDFile(Image3D* image, std::string fileName)
 		image->Allocate(widthP2, heightP2, depthP2, 2);
 		uint16_t* imdata = (uint16_t*)image->Data();
 		uint64_t inx = 0; 
+		for(uint64_t i = 0; i < widthP2 * heightP2 * depthP2; i++)
+		{
+			imdata[i] = 0;
+		}
 		for(uint64_t k = 0; k < depth; k++)
 		{
 			for(uint64_t j = 0; j < height; j++)
@@ -65,7 +69,8 @@ bool Image3DFromNRRDFile(Image3D* image, std::string fileName)
 				
 				for(uint64_t i = 0; i < width; i++)
 				{
-					imdata[k * widthP2 * heightP2 + j * widthP2 + i] = ((uint16_t*)(nin->data))[inx]; 
+					uint16_t val = ((uint16_t*)(nin->data))[inx]; 
+					imdata[k * widthP2 * heightP2 + j * widthP2 + i] = val;
 					inx++;
 				}
 			}
@@ -78,19 +83,26 @@ bool Image3DFromNRRDFile(Image3D* image, std::string fileName)
 		image->Allocate(widthP2, heightP2, depthP2, 2);
 		int16_t* imdata = (int16_t*)image->Data();
 		uint64_t inx = 0; 
+		uint64_t offSetW = (widthP2 - width ) / 2;
+		uint64_t offSetH = (heightP2 - height ) / 2;
+		uint64_t offSetD = (depthP2 - depth ) / 2;
+		for(uint64_t i = 0; i < widthP2 * heightP2 * depthP2; i++)
+		{
+			imdata[i] = 0;
+		}
 		for(uint64_t k = 0; k < depth; k++)
 		{
 			for(uint64_t j = 0; j < height; j++)
 			{
 				for(uint64_t i = 0; i < width; i++)
 				{
-					imdata[k * widthP2 * heightP2 + j * widthP2 + i] = (32767 + (int)((int16_t*)(nin->data))[inx]) / 2;
-					//std::cout << imdata[k * width * height + j * width + i] << std::endl; 
+					uint16_t val = (32767 + (int)((int16_t*)(nin->data))[inx]) / 2;
+					imdata[k * widthP2 * heightP2 + j * widthP2 + i] = val;
 					inx++;
 				}
 			}
 		}
-					
+			
 	}
 	else
 	{
