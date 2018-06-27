@@ -26,23 +26,24 @@ MainWindow::MainWindow()
 	QObject::connect(tiffAction, &QAction::triggered, [this]()
 	{
 		QString fileName = QFileDialog::getOpenFileName(this, tr("Open Image"), "", tr("types of File(*)"));
-		renderViewport.ImportTIFFFile(fileName, &(controlPanel.sampleMapping->histogram->data));
+		renderViewport.volumeData->ImportTIFFFile(fileName);
+		renderViewport.Refresh();
 		std::cout << "Import tiff" << std::endl;
-		
 	});
 	
 	QObject::connect(nrrdAction, &QAction::triggered, [this]()
 	{
 		QString fileName = QFileDialog::getOpenFileName(this, tr("Open Image"), "", tr("types of File(*)"));
-		renderViewport.ImportNRRDFile(fileName, &(controlPanel.sampleMapping->histogram->data));
+		renderViewport.volumeData->ImportNRRDFile(fileName);
+		renderViewport.Refresh();
 		std::cout << "Import image" << std::endl;
-		
 	});
 	
 	QObject::connect(imageAction, &QAction::triggered, [this]()
 	{
 		QString fileName = QFileDialog::getOpenFileName(this, tr("Open Image"), "", tr("types of File(*)"));
-		renderViewport.ImportImageFile(fileName, &(controlPanel.sampleMapping->histogram->data));
+		renderViewport.volumeData->ImportImageFile(fileName);
+		renderViewport.Refresh();
 		std::cout << "Import image" << std::endl;
 		
 	});
@@ -51,22 +52,23 @@ MainWindow::MainWindow()
 	QObject::connect(dcmSqeuenceAction, &QAction::triggered, [this]()
 	{
 		QStringList fileNames = QFileDialog::getOpenFileNames(this, tr("Open Image"), "", tr("types of Files(*)"));
-		renderViewport.ImportDicomFileSequence(fileNames);
+		renderViewport.volumeData->ImportDicomFileSequence(fileNames);
+		renderViewport.Refresh();
 		std::cout << "Import Sequence" << std::endl;
 	});
 	QObject::connect(tiffSequenceAction, &QAction::triggered, [this]()
 	{
 		QStringList fileNames = QFileDialog::getOpenFileNames(this, tr("Open Image"), "", tr("types of Files(*)"));
-		renderViewport.ImportTIFFFileSequence(fileNames, &(controlPanel.sampleMapping->histogram->data));
-		//renderViewport.ImportTIFFFileSequence(fileNames, NULL);
+		renderViewport.volumeData->ImportTIFFFileSequence(fileNames);
+		renderViewport.Refresh();
 		std::cout << "Import Sequence" << std::endl;
 		
 	});
 	QObject::connect(imageSequenceAction, &QAction::triggered, [this]()
 	{
 		QStringList fileNames = QFileDialog::getOpenFileNames(this, tr("Open Image"), "", tr("types of Files(*)"));
-		renderViewport.ImportImageFileSequence(fileNames, &(controlPanel.sampleMapping->histogram->data));
-		//renderViewport.ImportTIFFFileSequence(fileNames, NULL);
+		renderViewport.volumeData->ImportImageFileSequence(fileNames);
+		renderViewport.Refresh();
 		std::cout << "Import Sequence" << std::endl;
 		
 	});

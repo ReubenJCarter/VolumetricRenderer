@@ -52,13 +52,19 @@ void RenderViewport::initializeGL()
 	photonVolumeObject = new PhotonVolumeObject;
 	photonVolumeObject->Init();
 	
+	TextureSliceObject::InitSystem();
+	textureSliceObject = new TextureSliceObject;
+	textureSliceObject->Init();
+	
 	textureVolumeObject->SetVisible(true); 
 	rayVolumeObject->SetVisible(false); 
 	photonVolumeObject->SetVisible(false); 
+	textureSliceObject->SetVisible(false);
 	
-	textureVolume = new Texture3D; 
+	volumeData = new VolumeData;
 	
-	textureGradient = new Texture3D;
+	textureVolume = &(volumeData->textureVolume); 
+	textureGradient = &(volumeData->textureGradient);
 	
 	textureLUT = new Texture1D;
 	
@@ -169,183 +175,6 @@ void RenderViewport::keyReleaseEvent(QKeyEvent *event)
 void RenderViewport::EnableDisableAxis(bool en)
 {
 	axisObject->SetVisible(en);
-}
-
-void RenderViewport::ImportDicomFile(QString fileName)
-{
-	
-}
-
-void RenderViewport::ImportDicomFileSequence(QStringList fileNames)
-{
-	std::vector<std::string> files;
-	for(int i = 0; i < fileNames.size(); i++)
-		files.push_back(fileNames.at(i).toStdString());
-	Image3D image3D;
-	bool loadGood = Image3DFromDicomFileSequence(&image3D, files);
-	if(!loadGood)
-		return; 
-	textureVolume->Allocate(image3D.Width(), image3D.Height(), image3D.Depth());
-	textureVolume->LoadData(image3D.Data());
-	
-	Refresh();
-}
-
-void RenderViewport::ImportTIFFFile(QString fileName, std::vector<float>* histogram)
-{
-	Image3D image3D;
-	bool loadGood = Image3DFromTIFFFile(&image3D, fileName.toStdString());
-	if(!loadGood)
-		return;
-	
-	loadGood = LoadFromImage3D(image3D);
-	
-	if(!loadGood)
-		return;
-	
-	if(histogram != NULL)
-	{
-		histogram->resize(textureVolumeHistogram.size());
-		for(int i = 0; i < textureVolumeHistogram.size(); i++)
-		{
-			(*histogram)[i] = textureVolumeHistogram[i]; 
-		}
-	}
-}
-
-void RenderViewport::ImportImageFile(QString fileName, std::vector<float>* histogram)
-{
-	Image3D image3D;
-	bool loadGood = Image3DFromDevilFile(&image3D, fileName.toStdString());
-	if(!loadGood)
-		return;
-	
-	loadGood = LoadFromImage3D(image3D);
-	
-	if(!loadGood)
-		return;
-	
-	if(histogram != NULL)
-	{
-		histogram->resize(textureVolumeHistogram.size());
-		for(int i = 0; i < textureVolumeHistogram.size(); i++)
-		{
-			(*histogram)[i] = textureVolumeHistogram[i]; 
-		}
-	}
-}
-
-void RenderViewport::ImportNRRDFile(QString fileName, std::vector<float>* histogram)
-{
-	Image3D image3D;
-	bool loadGood = Image3DFromNRRDFile(&image3D, fileName.toStdString());
-	if(!loadGood)
-		return;
-	
-	loadGood = LoadFromImage3D(image3D);
-	
-	if(!loadGood)
-		return;
-	
-	
-	if(histogram != NULL)
-	{
-		histogram->resize(textureVolumeHistogram.size());
-		for(int i = 0; i < textureVolumeHistogram.size(); i++)
-		{
-			(*histogram)[i] = textureVolumeHistogram[i]; 
-		}
-	}
-	
-}
-
-void RenderViewport::ImportTIFFFileSequence(QStringList fileNames, std::vector<float>* histogram)
-{
-	std::vector<std::string> files;
-	for(int i = 0; i < fileNames.size(); i++)
-		files.push_back(fileNames.at(i).toStdString());
-	
-	Image3D image3D;
-	bool loadGood = Image3DFromTIFFFileSequence(&image3D, files);
-	if(!loadGood)
-		return;
-	
-	loadGood = LoadFromImage3D(image3D);
-
-	if(!loadGood)
-		return;
-	
-	if(histogram != NULL)
-	{		
-		histogram->resize(textureVolumeHistogram.size());
-		for(int i = 0; i < textureVolumeHistogram.size(); i++)
-		{
-			(*histogram)[i] = textureVolumeHistogram[i]; 
-		}
-	}
-}
-
-void RenderViewport::ImportImageFileSequence(QStringList fileNames, std::vector<float>* histogram)
-{
-	std::vector<std::string> files;
-	for(int i = 0; i < fileNames.size(); i++)
-		files.push_back(fileNames.at(i).toStdString());
-	
-	Image3D image3D;
-	bool loadGood = Image3DFromDevilFileSequence(&image3D, files);
-	if(!loadGood)
-		return;
-	
-	loadGood = LoadFromImage3D(image3D);
-	
-	if(!loadGood)
-		return;
-	
-	if(histogram != NULL)
-	{		
-		histogram->resize(textureVolumeHistogram.size());
-		for(int i = 0; i < textureVolumeHistogram.size(); i++)
-		{
-			(*histogram)[i] = textureVolumeHistogram[i]; 
-		}
-	}
-}
-
-bool RenderViewport::LoadFromImage3D(Image3D& image3D)
-{
-	if(image3D.Width()  == 0 || image3D.Height()  == 0 || image3D.Depth()  == 0)
-	{
-		std::cout << "RenderViewport: Could not load image 3d into viewport" << std::endl; 
-		return false;
-	}
-	
-	std::cout << "RenderViewport: Building intensity image" << std::endl; 
-	Image3D IntensityImage;
-	IntensityImage.Allocate(image3D.Width(), image3D.Height(), image3D.Depth(), 2); 
-	IntensityImage.Copy(image3D); 
-	IntensityImage.Normalize();
-	IntensityImage.Median2D();
-	
-	std::cout << "RenderViewport: Building intensity texture" << std::endl; 
-	textureVolume->Allocate(image3D.Width(), image3D.Height(), image3D.Depth(), false, 1, 2);
-	textureVolume->LoadData(IntensityImage.Data());
-	
-	std::cout << "RenderViewport: Building histogram" << std::endl; 
-	IntensityImage.Histogram(&textureVolumeHistogram); 
-	
-	std::cout << "RenderViewport: Building gradient image" << std::endl; 
-	Image3D gradient3D;
-	gradient3D.Allocate(image3D.Width(), image3D.Height(), image3D.Depth(), 3);
-	
-	gradient3D.Sobel(IntensityImage);
-	
-	std::cout << "RenderViewport: Building gradient texture" << std::endl; 
-	textureGradient->Allocate(gradient3D.Width(), gradient3D.Height(), gradient3D.Depth(), false, 3);
-	textureGradient->LoadData(gradient3D.Data());
-	
-	Refresh();
-	
-	return true; 
 }
 
 void RenderViewport::LoadLUT(float* buffer, int sizeLUT)

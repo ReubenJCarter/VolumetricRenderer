@@ -3,11 +3,14 @@
 
 #include "Common.hpp"
 
+
 #include "Image3D.hpp"
+#include "VolumeData.hpp"
 #include "Renderer/CameraObject.hpp"
 #include "Renderer/TextureVolumeObject.hpp"
 #include "Renderer/RayVolumeObject.hpp"
 #include "Renderer/PhotonVolumeObject.hpp"
+#include "Renderer/TextureSliceObject.hpp"
 #include "Renderer/Texture3D.hpp"
 #include "Renderer/TextureCube.hpp"
 #include "Renderer/Texture1D.hpp"
@@ -41,25 +44,19 @@ class RenderViewport: public QOpenGLWidget
 		TextureVolumeObject* textureVolumeObject; 
 		RayVolumeObject* rayVolumeObject; 
 		PhotonVolumeObject* photonVolumeObject;
+		TextureSliceObject* textureSliceObject;
 		Texture3D* textureVolume; 
 		Texture3D* textureGradient; 
 		TextureCube* textureEnvMap; 
 		Texture1D* textureLUT; 
 		AxisObject* axisObject;
 		std::vector<float> textureVolumeHistogram;
+		VolumeData* volumeData; 
 		
 		RenderViewport();
 		
 	public slots:
 		void EnableDisableAxis(bool en);
-		void ImportDicomFile(QString fileName);
-		void ImportDicomFileSequence(QStringList fileNames);
-		void ImportTIFFFile(QString fileName, std::vector<float>* histogram=NULL);
-		void ImportImageFile(QString fileName, std::vector<float>* histogram=NULL);
-		void ImportNRRDFile(QString fileName, std::vector<float>* histogram=NULL);
-		void ImportTIFFFileSequence(QStringList fileNames, std::vector<float>* histogram=NULL);
-		void ImportImageFileSequence(QStringList fileNames, std::vector<float>* histogram=NULL);
-		bool LoadFromImage3D(Image3D& image3D);
 		void LoadLUT(float* buffer, int sizeLUT);
 		void LoadDefaultEnvMap();
 		void ChooseRenderer(RENDER_TYPE rt);

@@ -2,6 +2,7 @@
 
 #include "Common.hpp"
 
+#include "VolumeData.hpp"
 #include "RenderViewport.hpp"
 #include "ControlPanel.hpp"
 

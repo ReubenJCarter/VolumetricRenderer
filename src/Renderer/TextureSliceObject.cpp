@@ -118,9 +118,8 @@ void TextureSliceObject::InitSystem()
 }
 
 
-TextureSliceObject::TextureSliceObject(unsigned int slices)
+TextureSliceObject::TextureSliceObject()
 {
-	volumeSlices = slices;
 	brightness = 0;
 	contrast = 1;
 }
@@ -150,26 +149,26 @@ void TextureSliceObject::Init()
 	v.z = 0;
 	v.x = -extent;
 	v.y = -extent;
-	vertexData[i * 4 + 0] = v;
+	vertexData[0] = v;
 	v.x = extent;
 	v.y = -extent;
-	vertexData[i * 4 + 1] = v;
+	vertexData[1] = v;
 	v.x = extent;
 	v.y = extent;
-	vertexData[i * 4 + 2] = v;
+	vertexData[2] = v;
 	v.x = -extent;
 	v.y = extent;
-	vertexData[i * 4 + 3] = v;
+	vertexData[3] = v;
 
 	
 	std::vector<unsigned int> elementData(6); 
 	
-	elementData[i * 6 + 0] = 0;
-	elementData[i * 6 + 1] = 1;
-	elementData[i * 6 + 2] = 2;
-	elementData[i * 6 + 3] = 2;
-	elementData[i * 6 + 4] = 3;
-	elementData[i * 6 + 5] = 0;
+	elementData[0] = 0;
+	elementData[1] = 1;
+	elementData[2] = 2;
+	elementData[3] = 2;
+	elementData[4] = 3;
+	elementData[5] = 0;
 
 	
 	ogl->glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);

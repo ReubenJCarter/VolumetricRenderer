@@ -9,6 +9,7 @@ set (volumetricRendererSrc
 		RenderViewport.cpp
 		TestGenerateVolume.cpp
 		SampleMappingEditor.cpp
+		VolumeData.cpp
 		
 		Renderer/Texture3D.cpp
 		Renderer/TextureCube.cpp
@@ -18,6 +19,7 @@ set (volumetricRendererSrc
 		Renderer/TextureVolumeObject.cpp
 		Renderer/RayVolumeObject.cpp
 		Renderer/PhotonVolumeObject.cpp
+		Renderer/TextureSliceObject.cpp
 		Renderer/CameraObject.cpp
 		Renderer/CameraControl.cpp
 		Renderer/AxisObject.cpp
