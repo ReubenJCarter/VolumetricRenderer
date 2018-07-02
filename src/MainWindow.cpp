@@ -105,6 +105,11 @@ MainWindow::MainWindow()
 		}
 	});
 	
+	QObject::connect(controlPanel.button2D, &QPushButton::clicked, [this](bool but)
+	{
+		renderViewport.ChooseRenderer(RenderViewport::IMAGE2D_RENDERER);
+	});
+	
 	QObject::connect(controlPanel.sampleMapping, &SampleMappingEditor::CurveChanged, [this]()
 	{
 		int sizeLUT = 256; 

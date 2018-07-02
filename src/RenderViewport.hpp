@@ -37,7 +37,7 @@ class RenderViewport: public QOpenGLWidget
 		void keyReleaseEvent(QKeyEvent *event);
 		
 	public:
-		enum RENDER_TYPE{SLICE_RENDER, RAY_RENDER, PHOTON_RENDER}; 
+		enum RENDER_TYPE{IMAGE2D_RENDERER, SLICE_RENDER, RAY_RENDER, PHOTON_RENDER}; 
 		RENDER_TYPE renderType; 
 		CameraObject* cameraObject; 
 		CameraControl* cameraControl; 

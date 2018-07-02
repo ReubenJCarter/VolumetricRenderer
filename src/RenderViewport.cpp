@@ -287,23 +287,27 @@ void RenderViewport::LoadDefaultEnvMap()
 void RenderViewport::ChooseRenderer(RENDER_TYPE rt)
 {
 	renderType = rt; 
+	
+	textureVolumeObject->SetVisible(false); 
+	rayVolumeObject->SetVisible(false); 
+	photonVolumeObject->SetVisible(false); 
+	textureSliceObject->SetVisible(false); 
+	
 	if(renderType == SLICE_RENDER)
 	{
 		textureVolumeObject->SetVisible(true); 
-		rayVolumeObject->SetVisible(false); 
-		photonVolumeObject->SetVisible(false); 
 	}
 	else if(renderType == RAY_RENDER)
 	{
-		textureVolumeObject->SetVisible(false); 
 		rayVolumeObject->SetVisible(true); 
-		photonVolumeObject->SetVisible(false); 
 	}
 	else if(renderType == PHOTON_RENDER)
 	{
-		textureVolumeObject->SetVisible(false); 
-		rayVolumeObject->SetVisible(false); 
 		photonVolumeObject->SetVisible(true); 
+	}
+	else if(renderType == IMAGE2D_RENDERER)
+	{
+		textureSliceObject->SetVisible(true); 
 	}
 	
 	Refresh();
