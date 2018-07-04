@@ -17,4 +17,7 @@ class CameraObject: public Object3D
 		glm::mat4 GetProjectionMatrix(float windowWidth, float windowHeight);
 		glm::mat4 GetViewMatrix();
 		float GetFovV();
+		void SetOrtho(bool o){ortho = o;}
+		bool GetOrtho(){return ortho;}
+		void SetNearClipping(bool n){nearClipping = n;};
 };

@@ -56,11 +56,6 @@ void RenderViewport::initializeGL()
 	textureSliceObject = new TextureSliceObject;
 	textureSliceObject->Init();
 	
-	textureVolumeObject->SetVisible(false); 
-	rayVolumeObject->SetVisible(false); 
-	photonVolumeObject->SetVisible(false); 
-	textureSliceObject->SetVisible(true);
-	
 	volumeData = new VolumeData;
 	
 	textureVolume = &(volumeData->textureVolume); 
@@ -108,6 +103,9 @@ void RenderViewport::initializeGL()
 	
 	SetBackFaceCulling(true);
 	
+	ChooseRenderer(IMAGE2D_RENDERER);
+	
+	
 	//Update the viewport in real time if the photon volume object is in use
 	QTimer* updateTimer = new QTimer();
 	updateTimer->setInterval(1);
@@ -138,11 +136,14 @@ void RenderViewport::paintGL()
     ogl->glClear(GL_COLOR_BUFFER_BIT);
 	ogl->glClear(GL_DEPTH_BUFFER_BIT);
 	
-	axisObject->Render(cameraObject->GetViewMatrix(), cameraObject->GetProjectionMatrix(windowWidth, windowHeight));
-	textureVolumeObject->Render(cameraObject->GetViewMatrix(), cameraObject->GetProjectionMatrix(windowWidth, windowHeight));
-	rayVolumeObject->Render(cameraObject->GetViewMatrix(), cameraObject->GetProjectionMatrix(windowWidth, windowHeight));
-	photonVolumeObject->Render(cameraObject->GetViewMatrix(), cameraObject->GetProjectionMatrix(windowWidth, windowHeight));
-	textureSliceObject->Render(cameraObject->GetViewMatrix(), cameraObject->GetProjectionMatrix(windowWidth, windowHeight));
+	glm::mat4 viewMat = cameraObject->GetViewMatrix();
+	glm::mat4 projectionMat = cameraObject->GetProjectionMatrix(windowWidth, windowHeight);
+	
+	axisObject->Render(viewMat, projectionMat);
+	textureVolumeObject->Render(viewMat, projectionMat);
+	rayVolumeObject->Render(viewMat, projectionMat);
+	photonVolumeObject->Render(viewMat, projectionMat);
+	textureSliceObject->Render(viewMat, projectionMat);
 	
 	PrintGLErrors();
 }
@@ -314,6 +315,12 @@ void RenderViewport::ChooseRenderer(RENDER_TYPE rt)
 	{
 		textureSliceObject->SetVisible(true); 
 	}
+	
+	
+	if(renderType == IMAGE2D_RENDERER)
+		cameraObject->SetOrtho(true);
+	else
+		cameraObject->SetOrtho(false); 
 	
 	Refresh();
 }

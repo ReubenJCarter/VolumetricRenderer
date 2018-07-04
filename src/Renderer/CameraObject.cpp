@@ -19,7 +19,10 @@ glm::mat4 CameraObject::GetProjectionMatrix(float windowWidth, float windowHeigh
 	if(!ortho) 
 		projMat = glm::perspectiveLH(degtorad * fovV, aspect, nearClipping, farClipping);
 	else//have no idea if this is right yet ... TODO
-		projMat = glm::ortho(-windowWidth/2, windowWidth/2, -windowHeight/2, windowHeight/2, nearClipping, farClipping);
+	{
+		float asp = windowWidth / windowHeight; 
+		projMat = glm::ortho(-asp/2, asp/2, -0.5f, 0.5f, -10000.0f, 10000.0f);
+	}
 	return projMat; 
 }
 
