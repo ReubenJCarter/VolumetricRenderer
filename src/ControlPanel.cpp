@@ -19,14 +19,15 @@ ControlPanel::ControlPanel(): QDockWidget("Control Panel")
 	//Base settings
 	QHBoxLayout* modeLayout = new QHBoxLayout();
 	layoutBase->addLayout(modeLayout); 
-	button3D = new QPushButton("3D");
-	button3D->setCheckable(true);
-	modeLayout->addWidget(button3D);
 	button2D = new QPushButton("2D"); 
 	button2D->setCheckable(true);
 	button2D->setChecked(true);
 	button2D->setEnabled(false);
 	modeLayout->addWidget(button2D);
+	button3D = new QPushButton("3D");
+	button3D->setCheckable(true);
+	modeLayout->addWidget(button3D);
+	
 	 
 	//2D Settings
 	groupBox2D = new QGroupBox("2D Settings");

@@ -56,10 +56,10 @@ void RenderViewport::initializeGL()
 	textureSliceObject = new TextureSliceObject;
 	textureSliceObject->Init();
 	
-	textureVolumeObject->SetVisible(true); 
+	textureVolumeObject->SetVisible(false); 
 	rayVolumeObject->SetVisible(false); 
 	photonVolumeObject->SetVisible(false); 
-	textureSliceObject->SetVisible(false);
+	textureSliceObject->SetVisible(true);
 	
 	volumeData = new VolumeData;
 	
@@ -84,6 +84,10 @@ void RenderViewport::initializeGL()
 	
 	LoadDefaultEnvMap();
 
+	textureSliceObject->SetVolumeTexture(textureVolume); 
+	textureSliceObject->SetGradientTexture(textureGradient); 
+	textureSliceObject->SetLUTTexture(textureLUT); 
+	
 	textureVolumeObject->SetVolumeTexture(textureVolume); 
 	textureVolumeObject->SetGradientTexture(textureGradient); 
 	textureVolumeObject->SetLUTTexture(textureLUT); 
@@ -138,6 +142,7 @@ void RenderViewport::paintGL()
 	textureVolumeObject->Render(cameraObject->GetViewMatrix(), cameraObject->GetProjectionMatrix(windowWidth, windowHeight));
 	rayVolumeObject->Render(cameraObject->GetViewMatrix(), cameraObject->GetProjectionMatrix(windowWidth, windowHeight));
 	photonVolumeObject->Render(cameraObject->GetViewMatrix(), cameraObject->GetProjectionMatrix(windowWidth, windowHeight));
+	textureSliceObject->Render(cameraObject->GetViewMatrix(), cameraObject->GetProjectionMatrix(windowWidth, windowHeight));
 	
 	PrintGLErrors();
 }

@@ -12,24 +12,24 @@ MainWindow::MainWindow()
 	importAction = fileMenu->addMenu("Import");
 	importSequenceAction = fileMenu->addMenu("Import Sequence");
 	
-	QAction* tiffAction = importAction->addAction("tiff");
+	//QAction* tiffAction = importAction->addAction("tiff");
 	QAction* imageAction = importAction->addAction("image");
 	QAction* nrrdAction = importAction->addAction("nrrd");
 	QAction* dcmSqeuenceAction = importSequenceAction->addAction("dcm");
-	QAction* tiffSequenceAction = importSequenceAction->addAction("tiff");
+	//QAction* tiffSequenceAction = importSequenceAction->addAction("tiff");
 	QAction* imageSequenceAction = importSequenceAction->addAction("image");
 	
 	QObject::connect(saveAction, SIGNAL(triggered()), this, SLOT(Save()));
 	QObject::connect(loadAction, SIGNAL(triggered()), this, SLOT(Load()));
 	
-	
+	/*
 	QObject::connect(tiffAction, &QAction::triggered, [this]()
 	{
 		QString fileName = QFileDialog::getOpenFileName(this, tr("Open Image"), "", tr("types of File(*)"));
 		renderViewport.volumeData->ImportTIFFFile(fileName);
 		renderViewport.Refresh();
 		std::cout << "Import tiff" << std::endl;
-	});
+	});*/
 	
 	QObject::connect(nrrdAction, &QAction::triggered, [this]()
 	{
@@ -56,14 +56,14 @@ MainWindow::MainWindow()
 		renderViewport.Refresh();
 		std::cout << "Import Sequence" << std::endl;
 	});
-	QObject::connect(tiffSequenceAction, &QAction::triggered, [this]()
+	/*QObject::connect(tiffSequenceAction, &QAction::triggered, [this]()
 	{
 		QStringList fileNames = QFileDialog::getOpenFileNames(this, tr("Open Image"), "", tr("types of Files(*)"));
 		renderViewport.volumeData->ImportTIFFFileSequence(fileNames);
 		renderViewport.Refresh();
 		std::cout << "Import Sequence" << std::endl;
 		
-	});
+	});*/
 	QObject::connect(imageSequenceAction, &QAction::triggered, [this]()
 	{
 		QStringList fileNames = QFileDialog::getOpenFileNames(this, tr("Open Image"), "", tr("types of Files(*)"));
@@ -108,6 +108,23 @@ MainWindow::MainWindow()
 	QObject::connect(controlPanel.button2D, &QPushButton::clicked, [this](bool but)
 	{
 		renderViewport.ChooseRenderer(RenderViewport::IMAGE2D_RENDERER);
+	});
+	
+	QObject::connect(controlPanel.button3D, &QPushButton::clicked, [this](bool but)
+	{
+		QString text = controlPanel.comboRenderer->currentText(); 
+		if(text == QString("Slice"))
+		{
+			renderViewport.ChooseRenderer(RenderViewport::SLICE_RENDER);
+		}
+		else if(text == QString("Ray"))
+		{
+			renderViewport.ChooseRenderer(RenderViewport::RAY_RENDER);
+		}
+		else if(text == QString("Photon"))
+		{
+			renderViewport.ChooseRenderer(RenderViewport::PHOTON_RENDER);
+		}
 	});
 	
 	QObject::connect(controlPanel.sampleMapping, &SampleMappingEditor::CurveChanged, [this]()

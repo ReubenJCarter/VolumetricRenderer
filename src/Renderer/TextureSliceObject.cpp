@@ -6,10 +6,7 @@ std::string TextureSliceObject::vertSrc= R"(
 //attribs
 layout(location = 0) in vec4 pointPosition;
 //transforms
-uniform mat4 modelViewProjectionMatrix;
-uniform mat4 modelMatrix;
-uniform mat4 viewMatrix;
-uniform mat4 projectionMatrix;
+
 //outputs
 out vec4 fragmentPosition;
 //main
@@ -17,12 +14,7 @@ void main()
 {
 	//compute outputs
 	fragmentPosition = vec4(pointPosition.x, pointPosition.y, pointPosition.z, 1.0f);
-	mat4 mvMat = viewMatrix * modelMatrix; 
-	mat4 mvpMat = mat4(1.0f);
-	mvpMat[3][0] = mvMat[3][0]; 
-	mvpMat[3][1] = mvMat[3][1]; 
-	mvpMat[3][2] = mvMat[3][2]; 
-	gl_Position = projectionMatrix * mvpMat * vec4(pointPosition.x, pointPosition.y, pointPosition.z, 1.0f);
+	gl_Position = vec4(pointPosition.x, pointPosition.y, pointPosition.z, 1.0f);
 }
 )";
  
@@ -33,11 +25,7 @@ std::string TextureSliceObject::fragSrc = R"(
 in vec4 fragmentPosition;
 
 //uniforms
-uniform mat4 modelViewProjectionMatrix;
-uniform mat4 modelMatrix;
-uniform mat4 viewMatrix;
-uniform mat4 invMVMatrix;
-uniform mat4 projectionMatrix;
+
 uniform sampler3D volumeTexture;
 uniform vec3 texDim;
 uniform float brightness;
@@ -53,10 +41,8 @@ void main()
 	float hasp = texDim.x / texDim.y;
 	float dasp = texDim.z / texDim.y;
 	
-	vec3 fp = fragmentPosition.xyz;
+	vec4 col = texture(volumeTexture, (fragmentPosition.xyz * vec3(1, 1, 1/dasp) + vec3(0.5f, 0.5f, 0.5f)));
 	
-	vec4 fragPos = invMVMatrix * vec4(fp, 0.0f);
-	vec4 col = texture(volumeTexture, (fragPos.xyz * vec3(1, 1, 1/dasp) + vec3(0.5f, 0.5f, 0.5f)));
 	if(col.w <= 0.0001f)
 		discard; 
 	
@@ -201,9 +187,7 @@ void TextureSliceObject::Render(glm::mat4 viewMatrix, glm::mat4 projectionMatrix
 	OPENGL_FUNC_MACRO
 	
 	//compute mvp matrix
-	glm::mat4 modelMatrix = GetModelMatrix(); 
-	glm::mat4 mvpMatrix = projectionMatrix * viewMatrix * GetModelMatrix();
-	glm::mat4 invMVMatrix = glm::inverse(viewMatrix * GetModelMatrix());
+	
 		
 	//disable writting to depth buffer
 	ogl->glEnable(GL_DEPTH_TEST);
@@ -224,20 +208,7 @@ void TextureSliceObject::Render(glm::mat4 viewMatrix, glm::mat4 projectionMatrix
 	ogl->glUseProgram(programShaderObject);
 	
 	//update mvp transform uniform in shader
-	int modelViewProjectionMatrixLocation = ogl->glGetUniformLocation(programShaderObject, "modelViewProjectionMatrix"); 
-	ogl->glUniformMatrix4fv(modelViewProjectionMatrixLocation, 1, false, glm::value_ptr(mvpMatrix));
 	
-	int modelMatrixLocation = ogl->glGetUniformLocation(programShaderObject, "modelMatrix"); 
-	ogl->glUniformMatrix4fv(modelMatrixLocation, 1, false, glm::value_ptr(modelMatrix));
-	
-	int viewMatrixLocation = ogl->glGetUniformLocation(programShaderObject, "viewMatrix"); 
-	ogl->glUniformMatrix4fv(viewMatrixLocation, 1, false, glm::value_ptr(viewMatrix));
-	
-	int projectionMatrixLocation = ogl->glGetUniformLocation(programShaderObject, "projectionMatrix"); 
-	ogl->glUniformMatrix4fv(projectionMatrixLocation, 1, false, glm::value_ptr(projectionMatrix));
-	
-	int invMVMatrixLocation = ogl->glGetUniformLocation(programShaderObject, "invMVMatrix"); 
-	ogl->glUniformMatrix4fv(invMVMatrixLocation, 1, false, glm::value_ptr(invMVMatrix));
 	
 	//update 3d texture
 	int texDimLocation = ogl->glGetUniformLocation(programShaderObject, "texDim"); 
