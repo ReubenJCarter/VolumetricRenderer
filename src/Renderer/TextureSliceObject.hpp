@@ -44,6 +44,7 @@ class TextureSliceObject: public Object3D
 		
 		float brightness;
 		float contrast;
+		float threshold;
 	
 	public:
 		static void InitSystem();
@@ -56,4 +57,7 @@ class TextureSliceObject: public Object3D
 		void SetVolumeTexture(Texture3D* vt);
 		void SetGradientTexture(Texture3D* gt);
 		void SetLUTTexture(Texture1D* lt);
+		void SetBrightness(double b);
+		void SetContrast(double c);
+		void SetThreshold(double t);
 };

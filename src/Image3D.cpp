@@ -800,9 +800,9 @@ void Image3D::Sobel(Image3D& inImg)
 							   vals[24] * -1.0 + vals[25] * 0 + vals[26] * 1.0)/22.0;
 				
 				
-				int gX = ((int)gradX + 65535) / 2;
-				int gY = ((int)gradY + 65535) / 2;
-				int gZ = ((int)gradZ + 65535) / 2;
+				double gX = (gradX + 65535.0) / 2.0;
+				double gY = (gradY + 65535.0) / 2.0;
+				double gZ = (gradZ + 65535.0) / 2.0;
 				
 				
 				((unsigned char*)data)[(z * width * height + y * width + x) * pixelSize + 0] = gX * (255.0 / 65535.0);
@@ -955,5 +955,57 @@ void Image3D::Histogram(std::vector<float>* histogram)
 	{
 		(*histogram)[i] = (*histogram)[i] / maxBinCount;
 	}
+	}
+}
+
+void Image3D::BrightnessContrastThreshold(double brightness, double contrast, double threshold)
+{
+	if(pixelSize == 1)//8 bit monochrome images
+	{
+	for(uint64_t z = 0; z < depth; z++)
+	{
+		for(uint64_t y = 0; y < height; y++)
+		{
+			for(uint64_t x = 0; x < width; x++)
+			{
+				
+				unsigned char v = ((unsigned char*)data)[(z * width * height + y * width + x) * pixelSize + 0];
+				
+				double vf = (double)v / 255.0;
+				
+				vf = vf * contrast + brightness; 
+				vf = vf > threshold ? vf : 0.0;
+				if(vf < 0.0) vf = 0.0;
+				if(vf > 1.0) vf = 1.0; 
+				
+				((unsigned char*)data)[(z * width * height + y * width + x) * pixelSize + 0] = vf * 255;
+				
+			}
+		}
+	}
+	}
+	else if(pixelSize == 2)//16 bit monochrome images
+	{
+	for(uint64_t z = 0; z < depth; z++)
+	{
+		for(uint64_t y = 0; y < height; y++)
+		{
+			for(uint64_t x = 0; x < width; x++)
+			{
+				
+				uint16_t v = ((uint16_t*)data)[(z * width * height + y * width + x)];
+				
+				double vf = (double)v / 65535.0;
+				
+				vf = vf * contrast + brightness; 
+				vf = vf > threshold ? vf : 0.0;
+				if(vf < 0.0) vf = 0.0;
+				if(vf > 1.0) vf = 1.0; 
+				
+				((uint16_t*)data)[(z * width * height + y * width + x)] = vf * 65535;
+				
+			}
+		}
+	}	
 	}
 }

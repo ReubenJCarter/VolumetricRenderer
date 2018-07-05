@@ -33,4 +33,5 @@ class Image3D
 		void Sobel(Image3D& inImg);
 		void Normalize();
 		void Histogram(std::vector<float>* histogram);
+		void BrightnessContrastThreshold(double brightness, double contrast, double threshold);
 };

@@ -341,6 +341,27 @@ void RenderViewport::SetBackFaceCulling(bool cull)
 	Refresh();
 }
 
+void RenderViewport::SetBrightness(double b)
+{
+	textureSliceObject->SetBrightness(b);
+	
+	Refresh();
+}
+
+void RenderViewport::SetContrast(double c)
+{
+	textureSliceObject->SetContrast(c);
+	
+	Refresh();
+}
+
+void RenderViewport::SetThreshold(double t)
+{
+	textureSliceObject->SetThreshold(t);
+	
+	Refresh();
+}
+
 void RenderViewport::Refresh()
 {
 	photonVolumeObject->ClearPhotonRender(windowWidth, windowHeight);

@@ -25,6 +25,26 @@ class Vector3Chooser: public QWidget
 		void setValue(double xV, double yV, double zV);
 };
 
+class CustomSlider: public QSlider
+{
+	Q_OBJECT
+	public:
+		CustomSlider(Qt::Orientation orientation, double dv):
+		QSlider(orientation)	
+		{
+			defaultValue = dv;
+		}
+		
+	protected:
+		double defaultValue; 
+		
+		void mouseDoubleClickEvent(QMouseEvent *event)
+		{
+			setValue(defaultValue);
+			QSlider::mouseDoubleClickEvent(event);
+		}
+};
+
 class ScalarChooser: public QWidget
 {
 	Q_OBJECT
@@ -34,16 +54,17 @@ class ScalarChooser: public QWidget
 		double maxVal; 
 		QHBoxLayout* layout;
 		QLabel* label;
-		QSlider* slider;
+		CustomSlider* slider;
 		QDoubleSpinBox* spin;
 		
 	public:
-		ScalarChooser(QString name, double minv=0, double maxv=1, double start=0);
+		ScalarChooser(QString name, double minv=0, double maxv=1, double start=0, double step=1, bool hasSlider=true);
 		
 	signals:
 		void valueChanged(double val);
 		
 	public slots:
 		void setValue(double val);
+		double value();
 };
 

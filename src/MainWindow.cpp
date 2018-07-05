@@ -147,6 +147,49 @@ MainWindow::MainWindow()
 		renderViewport.SetBackFaceCulling(value);
 	});
 	
+	QObject::connect(controlPanel.scalarChooserBrightness, &ScalarChooser::valueChanged, [this](double value)
+	{
+		renderViewport.SetBrightness(value);
+	});
+	
+	QObject::connect(controlPanel.scalarChooserContrast, &ScalarChooser::valueChanged, [this](double value)
+	{
+		renderViewport.SetContrast(value);
+	});
+	
+	QObject::connect(controlPanel.scalarChooserThreshold, &ScalarChooser::valueChanged, [this](double value)
+	{
+		renderViewport.SetThreshold(value);
+	});
+	
+	QObject::connect(controlPanel.buttonBrightnessContrastApply, &QPushButton::clicked, [this](bool but)
+	{
+		double b = controlPanel.scalarChooserBrightness->value();
+		double c = controlPanel.scalarChooserContrast->value();
+		double t = controlPanel.scalarChooserThreshold->value();
+		
+		//reset  b c t
+		controlPanel.scalarChooserBrightness->setValue(0);
+		controlPanel.scalarChooserContrast->setValue(0);
+		controlPanel.scalarChooserThreshold->setValue(0);
+		
+		double ammount = 10.0;
+		
+		double brightness = ammount * b / 100;
+	
+		double contrast; 
+	
+		if(c < 0)
+		{
+			contrast = 1.0 / ( ammount * (-c / 100.0) + 1.0 );
+		}
+		else
+		{
+			contrast = ammount * (c / 100.0) + 1.0;
+		}
+		
+		renderViewport.volumeData->ApplyBCTSettings(brightness, contrast, t);
+	});
 	
 	//central
 	setCentralWidget(&renderViewport);

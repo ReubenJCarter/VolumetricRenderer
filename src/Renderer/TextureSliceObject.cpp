@@ -34,6 +34,7 @@ uniform sampler3D volumeTexture;
 uniform vec3 texDim;
 uniform float brightness;
 uniform float contrast;
+uniform float threshold; 
 uniform sampler1D lutTexture;
 
 //output
@@ -50,9 +51,11 @@ void main()
 	if(col.w <= 0.0001f)
 		discard; 
 	
-	vec4 finalColor = texture(lutTexture, col.r);
+	float c = clamp(contrast * col.r + brightness, 0.0f, 1.0f); 
+		
+	vec4 finalColor = c > threshold ? vec4(c, c, c, 1.0f) : vec4(0, 0, 0, 0);
 	
-  	outputColor = vec4(1,1,1,1);//finalColor;
+  	outputColor = finalColor;
 }
 )";
  
@@ -273,10 +276,12 @@ void TextureSliceObject::Render(glm::mat4 viewMatrix, glm::mat4 projectionMatrix
 	}
 	
 	//update material uniforms
-	int materialAlphaLocation = ogl->glGetUniformLocation(programShaderObject, "brightness"); 
-	ogl->glUniform1f(materialAlphaLocation, brightness);
-	int materialPointSizeLocation = ogl->glGetUniformLocation(programShaderObject, "contrast"); 
-	ogl->glUniform1f(materialPointSizeLocation, contrast);
+	int materialBrightnessLocation = ogl->glGetUniformLocation(programShaderObject, "brightness"); 
+	ogl->glUniform1f(materialBrightnessLocation, brightness);
+	int materialContrastLocation = ogl->glGetUniformLocation(programShaderObject, "contrast"); 
+	ogl->glUniform1f(materialContrastLocation, contrast);
+	int materialThresholdLocation = ogl->glGetUniformLocation(programShaderObject, "threshold");
+	ogl->glUniform1f(materialThresholdLocation, threshold);
 	
 	//bind VAO
 	ogl->glBindVertexArray(vertexArrayObject);
@@ -320,4 +325,32 @@ void TextureSliceObject::SetGradientTexture(Texture3D* gt)
 void TextureSliceObject::SetLUTTexture(Texture1D* lt)
 {
 	lutTexture = lt;
+}
+
+
+void TextureSliceObject::SetBrightness(double b)
+{
+	double ammount = 10.0;
+	brightness = ammount * b / 100;
+}
+
+
+void TextureSliceObject::SetContrast(double c)
+{
+	double ammount = 10.0f;
+	
+	if(c < 0)
+	{
+		contrast = 1.0 / ( ammount * (-c / 100.0) + 1.0 );
+	}
+	else
+	{
+		contrast = ammount * (c / 100.0) + 1.0;
+	}
+}
+
+
+void TextureSliceObject::SetThreshold(double t)
+{
+	threshold = t;
 }

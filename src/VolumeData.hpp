@@ -23,4 +23,5 @@ class VolumeData
 		void ImportNRRDFile(QString fileName);
 		void ImportTIFFFileSequence(QStringList fileNames);
 		void ImportImageFileSequence(QStringList fileNames);
+		void ApplyBCTSettings(double b, double c, double t);
 };

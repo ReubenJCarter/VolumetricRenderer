@@ -117,7 +117,7 @@ bool VolumeData::BuildFromImage3D()
 	
 	std::cout << "VolumeData: Pre Processing intensity image" << std::endl; 
 
-	intensityImage.Normalize();
+	//intensityImage.Normalize();
 	intensityImage.Median2D();
 	
 	std::cout << "VolumeData: Building intensity texture" << std::endl; 
@@ -138,4 +138,27 @@ bool VolumeData::BuildFromImage3D()
 	
 	
 	return true; 
+}
+
+void VolumeData::ApplyBCTSettings(double b, double c, double t)
+{
+	intensityImage.BrightnessContrastThreshold(b, c, t);
+	
+	
+	
+	std::cout << "VolumeData: Building intensity texture" << std::endl; 
+	textureVolume.Allocate(intensityImage.Width(), intensityImage.Height(), intensityImage.Depth(), false, 1, 2);
+	textureVolume.LoadData(intensityImage.Data());
+	
+	std::cout << "VolumeData: Building histogram" << std::endl; 
+	intensityImage.Histogram(&textureVolumeHistogram); 
+	
+	std::cout << "VolumeData: Building gradient image" << std::endl; 
+	gradientImage.Allocate(intensityImage.Width(), intensityImage.Height(), intensityImage.Depth(), 3);
+	
+	gradientImage.Sobel(intensityImage);
+	
+	std::cout << "VolumeData: Building gradient texture" << std::endl; 
+	textureGradient.Allocate(gradientImage.Width(), gradientImage.Height(), gradientImage.Depth(), false, 3);
+	textureGradient.LoadData(gradientImage.Data());
 }

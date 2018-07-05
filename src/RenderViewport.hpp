@@ -62,5 +62,8 @@ class RenderViewport: public QOpenGLWidget
 		void ChooseRenderer(RENDER_TYPE rt);
 		void SetGradientThreshold(float threshold);
 		void SetBackFaceCulling(bool cull); 
+		void SetBrightness(double b); 
+		void SetContrast(double c); 
+		void SetThreshold(double t); 
 		void Refresh();
 };

@@ -36,6 +36,16 @@ ControlPanel::ControlPanel(): QDockWidget("Control Panel")
 	layoutGroup2D->setMargin(2);
 	groupBox2D->setLayout(layoutGroup2D);
 	
+	layoutGroup2D->addWidget(new QLabel("Brightness Contrast Threshold"));
+	scalarChooserBrightness = new ScalarChooser("Brightness", -1000, 1000.0, 0.0, 0.1, false);
+	layoutGroup2D->addWidget(scalarChooserBrightness);
+	scalarChooserContrast = new ScalarChooser("Contrast", -1000, 1000.0, 0.0, 0.1, false);
+	layoutGroup2D->addWidget(scalarChooserContrast);
+	scalarChooserThreshold = new ScalarChooser("Threshold", -1000, 1000.0, 0.0, 0.001, false);
+	layoutGroup2D->addWidget(scalarChooserThreshold);
+	buttonBrightnessContrastApply = new QPushButton("Apply");
+	layoutGroup2D->addWidget(buttonBrightnessContrastApply); 
+	
 	//3D Settings	
 	groupBox3D = new QGroupBox("3D Settings");
 	layoutBase->addWidget(groupBox3D);
@@ -70,7 +80,7 @@ ControlPanel::ControlPanel(): QDockWidget("Control Panel")
 		sampleMapping->show();
 	});
 	
-	chooserGradientThreshold = new ScalarChooser("Gradient Threshold", 0, 0.25, 0.05);
+	chooserGradientThreshold = new ScalarChooser("Gradient Threshold", 0, 0.25, 0.05, 0.05);
 	layoutGroup3D->addWidget(chooserGradientThreshold);
 	
 	checkBackFaceCulling = new QCheckBox(""); 

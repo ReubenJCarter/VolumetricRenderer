@@ -20,6 +20,10 @@ class ControlPanel: public QDockWidget
 		//2d settings
 		QGroupBox* groupBox2D; 
 		QVBoxLayout* layoutGroup2D;
+		ScalarChooser* scalarChooserContrast;
+		ScalarChooser* scalarChooserBrightness;
+		ScalarChooser* scalarChooserThreshold;
+		QPushButton* buttonBrightnessContrastApply; 
 		
 		//3d settings
 		QGroupBox* groupBox3D; 

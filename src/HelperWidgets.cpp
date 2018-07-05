@@ -57,48 +57,55 @@ void Vector3Chooser::setValue(double xV, double yV, double zV)
 }
 
 	
-ScalarChooser::ScalarChooser(QString name, double minv, double maxv, double start)
+ScalarChooser::ScalarChooser(QString name, double minv, double maxv, double start, double step, bool hasSlider )
 {
 	minVal = minv;
 	maxVal = maxv;
+	
+	sliderStep = (maxv - minv) / 100.0;
 	
 	layout = new QHBoxLayout();
 	setLayout(layout); 
 	
 	label = new QLabel(name);
-	slider = new QSlider(Qt::Horizontal);
-	spin = new QDoubleSpinBox();
-	
-	
 	layout->addWidget(label);
-	layout->addWidget(slider);
+	
+	spin = new QDoubleSpinBox();
 	layout->addWidget(spin);
-	
-	sliderStep = (maxv - minv) / 100.0;
-	
 	spin->setMaximum(maxv);
 	spin->setMinimum(minv);
-	spin->setSingleStep(sliderStep);
+	spin->setSingleStep(step);
 	spin->setValue(start);
 	spin->setDecimals(4);
 	
-	slider->setMinimum(0);
-	slider->setMaximum(100);
-	slider->setPageStep(1);
-	slider->setSingleStep(1);
-	slider->setValue((start - minv) / sliderStep);
-	
-	connect(slider, &QSlider::valueChanged, [=, this](int v)
+	if(hasSlider)
 	{
-		double newVal = minv + v * sliderStep;
-		spin->setValue(newVal);
-		emit valueChanged(newVal);
-	});
-	
+		slider = new CustomSlider(Qt::Horizontal, (start - minv) / sliderStep);
+		layout->addWidget(slider);
+		slider->setMinimum(0);
+		slider->setMaximum(100);
+		slider->setPageStep(1);
+		slider->setSingleStep(1);
+		slider->setValue((start - minv) / sliderStep);
+		
+		connect(slider, &QSlider::valueChanged, [=, this](int v)
+		{
+			double newVal = minv + v * sliderStep;
+			bool oldVal = spin->blockSignals(true);
+			spin->setValue(newVal);
+			spin->blockSignals(oldVal);
+			emit valueChanged(newVal);
+		});
+	}
 	
 	connect(spin,  QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=, this](double v)
 	{
-		slider->setValue((v - minv) / sliderStep); 
+		if(hasSlider)
+		{
+			bool oldVal = slider->blockSignals(true);
+			slider->setValue((v - minv) / sliderStep); 
+			slider->blockSignals(oldVal);
+		}
 		emit valueChanged(v);
 	});
 }
@@ -106,5 +113,11 @@ ScalarChooser::ScalarChooser(QString name, double minv, double maxv, double star
 void ScalarChooser::setValue(double val)
 {
 	spin->setValue(minVal + val * sliderStep);
+	
 	//slider->setValue((val - minVal) / sliderStep); 
+}
+
+double ScalarChooser::value()
+{
+	return spin->value();
 }
