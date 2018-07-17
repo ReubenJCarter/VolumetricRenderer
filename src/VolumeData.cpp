@@ -118,7 +118,7 @@ bool VolumeData::BuildFromImage3D()
 	std::cout << "VolumeData: Pre Processing intensity image" << std::endl; 
 
 	//intensityImage.Normalize();
-	intensityImage.Median2D();
+	//intensityImage.Median2D();
 	
 	std::cout << "VolumeData: Building intensity texture" << std::endl; 
 	textureVolume.Allocate(intensityImage.Width(), intensityImage.Height(), intensityImage.Depth(), false, 1, 2);

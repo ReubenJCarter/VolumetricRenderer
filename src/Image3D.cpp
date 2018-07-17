@@ -599,7 +599,7 @@ void Image3D::Sobel(Image3D& inImg)
 	{
 	unsigned char* d = (unsigned char*)inImg.data;
 	
-	std::vector<int> vals(27); 
+	std::vector<int> vals(27, 0); 
 	for(uint64_t z = 0; z < depth; z++)
 	{
 		for(uint64_t y = 0; y < height; y++)
@@ -660,37 +660,37 @@ void Image3D::Sobel(Image3D& inImg)
 				
 				
 				
-				double gradZ =(vals[0] * -1.0 + vals[1] * -3.0 + vals[2] * -1.0 +  
-							   vals[3] * -3.0 + vals[4] * -6.0 + vals[5] * -3.0 +  
-							   vals[6] * -1.0 + vals[7] * -3.0 + vals[8] * -1.0 + 
+				double gradZ =(vals[0] * -1.0 + vals[1] * -2.0 + vals[2] * -1.0 +  
+							   vals[3] * -2.0 + vals[4] * -4.0 + vals[5] * -2.0 +  
+							   vals[6] * -1.0 + vals[7] * -2.0 + vals[8] * -1.0 + 
 							   
-							   vals[18] * 1.0 + vals[19] * 3.0 + vals[20] * 1.0 +  
-							   vals[21] * 3.0 + vals[22] * 6.0 + vals[23] * 3.0 +  
-							   vals[24] * 1.0 + vals[25] * 3.0 + vals[26] * 1.0)/22.0;
+							   vals[18] * 1.0 + vals[19] * 2.0 + vals[20] * 1.0 +  
+							   vals[21] * 2.0 + vals[22] * 4.0 + vals[23] * 2.0 +  
+							   vals[24] * 1.0 + vals[25] * 2.0 + vals[26] * 1.0)/22.0;
 							   
 							   
-				double gradY =(vals[0] * -1.0 + vals[1] * -3.0 + vals[2] * -1.0 + 
+				double gradY =(vals[0] * -1.0 + vals[1] * -2.0 + vals[2] * -1.0 + 
 							   vals[3] * 0    + vals[4] * 0    + vals[5] * 0 + 
-							   vals[6] * 1.0  + vals[7] * 3.0  + vals[8] * 1.0 + 
+							   vals[6] * 1.0  + vals[7] * 2.0  + vals[8] * 1.0 + 
 							   
-							   vals[9] * -3.0 + vals[10] * -6.0 + vals[11] * -3.0 + 
+							   vals[9] * -2.0 + vals[10] * -4.0 + vals[11] * -2.0 + 
 							   vals[12] * 0   + vals[13] * 0    + vals[14] * 0 + 
-							   vals[15] * 3.0 + vals[16] * 6.0  + vals[17] * 3.0 + 
+							   vals[15] * 2.0 + vals[16] * 4.0  + vals[17] * 2.0 + 
 							   
-							   vals[18] * -1.0 + vals[19] * -3.0 + vals[20] * -1.0 + 
+							   vals[18] * -1.0 + vals[19] * -2.0 + vals[20] * -1.0 + 
 							   vals[21] * 0    + vals[22] * 0    + vals[23] * 0 + 
-							   vals[24] * 1.0  + vals[25] * 3.0  + vals[26] * 1.0)/22.0;
+							   vals[24] * 1.0  + vals[25] * 2.0  + vals[26] * 1.0)/22.0;
 							   
 				double gradX = (vals[0] * -1.0 + vals[1] * 0 + vals[2] * 1.0 + 
-							   vals[3] * -3.0  + vals[4] * 0 + vals[5] * 3.0 + 
+							   vals[3] * -2.0  + vals[4] * 0 + vals[5] * 2.0 + 
 							   vals[6] * -1.0  + vals[7] * 0 + vals[8] * 1.0 + 
 							   
-							   vals[9] *  -3.0 + vals[10] * 0 + vals[11] * 3.0 + 
-							   vals[12] * -6.0 + vals[13] * 0 + vals[14] * 6.0 + 
-							   vals[15] * -3.0 + vals[16] * 0 + vals[17] * 3.0 + 
+							   vals[9] *  -2.0 + vals[10] * 0 + vals[11] * 2.0 + 
+							   vals[12] * -4.0 + vals[13] * 0 + vals[14] * 4.0 + 
+							   vals[15] * -2.0 + vals[16] * 0 + vals[17] * 2.0 + 
 							   
 							   vals[18] * -1.0 + vals[19] * 0 + vals[20] * 1.0 + 
-							   vals[21] * -3.0 + vals[22] * 0 + vals[23] * 3.0 + 
+							   vals[21] * -2.0 + vals[22] * 0 + vals[23] * 2.0 + 
 							   vals[24] * -1.0 + vals[25] * 0 + vals[26] * 1.0)/22.0;
 				
 				
@@ -705,7 +705,7 @@ void Image3D::Sobel(Image3D& inImg)
 	{
 	uint16_t* d = (uint16_t*)inImg.data;
 	
-	std::vector<int> vals(27); 
+	std::vector<int> vals(27, 0); 
 	for(uint64_t z = 0; z < depth; z++)
 	{
 		for(uint64_t y = 0; y < height; y++)
@@ -766,37 +766,37 @@ void Image3D::Sobel(Image3D& inImg)
 				
 				
 				
-				double gradZ =(vals[0] * -1.0 + vals[1] * -3.0 + vals[2] * -1.0 +  
-							   vals[3] * -3.0 + vals[4] * -6.0 + vals[5] * -3.0 +  
-							   vals[6] * -1.0 + vals[7] * -3.0 + vals[8] * -1.0 + 
+				double gradZ =(vals[0] * -1.0 + vals[1] * -2.0 + vals[2] * -1.0 +  
+							   vals[3] * -2.0 + vals[4] * -4.0 + vals[5] * -2.0 +  
+							   vals[6] * -1.0 + vals[7] * -2.0 + vals[8] * -1.0 + 
 							   
-							   vals[18] * 1.0 + vals[19] * 3.0 + vals[20] * 1.0 +  
-							   vals[21] * 3.0 + vals[22] * 6.0 + vals[23] * 3.0 +  
-							   vals[24] * 1.0 + vals[25] * 3.0 + vals[26] * 1.0)/22.0;
+							   vals[18] * 1.0 + vals[19] * 2.0 + vals[20] * 1.0 +  
+							   vals[21] * 2.0 + vals[22] * 4.0 + vals[23] * 2.0 +  
+							   vals[24] * 1.0 + vals[25] * 2.0 + vals[26] * 1.0)/22.0;
 							   
 							   
-				double gradY =(vals[0] * -1.0 + vals[1] * -3.0 + vals[2] * -1.0 + 
+				double gradY =(vals[0] * -1.0 + vals[1] * -2.0 + vals[2] * -1.0 + 
 							   vals[3] * 0    + vals[4] * 0    + vals[5] * 0 + 
-							   vals[6] * 1.0  + vals[7] * 3.0  + vals[8] * 1.0 + 
+							   vals[6] * 1.0  + vals[7] * 2.0  + vals[8] * 1.0 + 
 							   
-							   vals[9] * -3.0 + vals[10] * -6.0 + vals[11] * -3.0 + 
+							   vals[9] * -2.0 + vals[10] * -4.0 + vals[11] * -2.0 + 
 							   vals[12] * 0   + vals[13] * 0    + vals[14] * 0 + 
-							   vals[15] * 3.0 + vals[16] * 6.0  + vals[17] * 3.0 + 
+							   vals[15] * 2.0 + vals[16] * 4.0  + vals[17] * 2.0 + 
 							   
-							   vals[18] * -1.0 + vals[19] * -3.0 + vals[20] * -1.0 + 
+							   vals[18] * -1.0 + vals[19] * -2.0 + vals[20] * -1.0 + 
 							   vals[21] * 0    + vals[22] * 0    + vals[23] * 0 + 
-							   vals[24] * 1.0  + vals[25] * 3.0  + vals[26] * 1.0)/22.0;
+							   vals[24] * 1.0  + vals[25] * 2.0  + vals[26] * 1.0)/22.0;
 							   
 				double gradX = (vals[0] * -1.0 + vals[1] * 0 + vals[2] * 1.0 + 
-							   vals[3] * -3.0  + vals[4] * 0 + vals[5] * 3.0 + 
+							   vals[3] * -2.0  + vals[4] * 0 + vals[5] * 2.0 + 
 							   vals[6] * -1.0  + vals[7] * 0 + vals[8] * 1.0 + 
 							   
-							   vals[9] *  -3.0 + vals[10] * 0 + vals[11] * 3.0 + 
-							   vals[12] * -6.0 + vals[13] * 0 + vals[14] * 6.0 + 
-							   vals[15] * -3.0 + vals[16] * 0 + vals[17] * 3.0 + 
+							   vals[9] *  -2.0 + vals[10] * 0 + vals[11] * 2.0 + 
+							   vals[12] * -4.0 + vals[13] * 0 + vals[14] * 4.0 + 
+							   vals[15] * -2.0 + vals[16] * 0 + vals[17] * 2.0 + 
 							   
 							   vals[18] * -1.0 + vals[19] * 0 + vals[20] * 1.0 + 
-							   vals[21] * -3.0 + vals[22] * 0 + vals[23] * 3.0 + 
+							   vals[21] * -2.0 + vals[22] * 0 + vals[23] * 2.0 + 
 							   vals[24] * -1.0 + vals[25] * 0 + vals[26] * 1.0)/22.0;
 				
 				
