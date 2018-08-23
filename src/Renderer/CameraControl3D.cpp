@@ -1,7 +1,7 @@
-#include "CameraControl.hpp"
+#include "CameraControl3D.hpp"
 
 
-CameraControl::CameraControl(CameraObject* camObj)
+CameraControl3D::CameraControl3D(CameraObject* camObj)
 {
 	cameraObject = camObj;
 	zoom = 1;
@@ -15,10 +15,11 @@ CameraControl::CameraControl(CameraObject* camObj)
 	posZ = 0;
 	moveSpeed = 0.005;
 	firstMouseMove = true; 
+	enabled = true; 
 }
 
 
-void CameraControl::mousePressEvent(QMouseEvent *event)
+void CameraControl3D::mousePressEvent(QMouseEvent *event)
 {
 	if(event->button() == Qt::LeftButton) 
 	{
@@ -45,7 +46,7 @@ void CameraControl::mousePressEvent(QMouseEvent *event)
 		UpdateCamera();
 }
 
-void CameraControl::mouseReleaseEvent(QMouseEvent *event)
+void CameraControl3D::mouseReleaseEvent(QMouseEvent *event)
 {
 	if(event->button() == Qt::LeftButton)
 	{ 
@@ -62,7 +63,7 @@ void CameraControl::mouseReleaseEvent(QMouseEvent *event)
 		UpdateCamera();
 }
 
-void CameraControl::wheelEvent(QWheelEvent *event)
+void CameraControl3D::wheelEvent(QWheelEvent *event)
 {
 	QPoint numPixels = event->pixelDelta();
     QPoint numDegrees = event->angleDelta() / 8;
@@ -88,7 +89,7 @@ void CameraControl::wheelEvent(QWheelEvent *event)
 	}
 }
 
-void CameraControl::mouseMoveEvent(QMouseEvent *event)
+void CameraControl3D::mouseMoveEvent(QMouseEvent *event)
 {
 	if(lmbState)
 	{		
@@ -116,7 +117,7 @@ void CameraControl::mouseMoveEvent(QMouseEvent *event)
 	}
 }
 
-void CameraControl::keyPressEvent(QKeyEvent *event)
+void CameraControl3D::keyPressEvent(QKeyEvent *event)
 {
 	
 	if(event->key() == Qt::Key_Shift) shiftState = true; 
@@ -131,24 +132,27 @@ void CameraControl::keyPressEvent(QKeyEvent *event)
 	}
 }
 
-void CameraControl::keyReleaseEvent(QKeyEvent *event)
+void CameraControl3D::keyReleaseEvent(QKeyEvent *event)
 {
 	if(event->key() == Qt::Key_Shift) shiftState = false; 
 }
 
-void CameraControl::UpdateCamera()
+void CameraControl3D::UpdateCamera()
 {
-	cameraObject->SetRotation(glm::vec3(rotx, roty, 0));
-	
-	float degtorad = 0.0174532925;
-	float finalPosX = posX + zoom * -cos(degtorad * rotx)* sin(degtorad * roty);
-	float finalPosY = posY + zoom * sin(degtorad * rotx);
-	float finalPosZ = posZ + zoom * -cos(degtorad * rotx)* cos(degtorad * roty);
-	cameraObject->SetPosition(glm::vec3(finalPosX, finalPosY, finalPosZ));
-	
-	std::cout << "Camera Updated:rot " << rotx << " " << roty
-			  << " zoom " << zoom 
-			  << " pos " << finalPosX << " " << finalPosY << " " << finalPosZ
-			  << std::endl; 
-	emit CameraUpdated();
+	if(enabled)
+	{
+		cameraObject->SetRotation(glm::vec3(rotx, roty, 0));
+		
+		float degtorad = 0.0174532925;
+		float finalPosX = posX + zoom * -cos(degtorad * rotx)* sin(degtorad * roty);
+		float finalPosY = posY + zoom * sin(degtorad * rotx);
+		float finalPosZ = posZ + zoom * -cos(degtorad * rotx)* cos(degtorad * roty);
+		cameraObject->SetPosition(glm::vec3(finalPosX, finalPosY, finalPosZ));
+		
+		std::cout << "Camera Updated:rot " << rotx << " " << roty
+				  << " zoom " << zoom 
+				  << " pos " << finalPosX << " " << finalPosY << " " << finalPosZ
+				  << std::endl; 
+		emit CameraUpdated();
+	}
 }

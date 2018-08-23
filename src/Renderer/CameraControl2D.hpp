@@ -6,7 +6,7 @@
 #include "CameraObject.hpp"
 
 
-class CameraControl: public QObject 
+class CameraControl2D: public QObject 
 {
 	Q_OBJECT
 	
@@ -20,12 +20,6 @@ class CameraControl: public QObject
 		int mousePrevY;
 		float zoomSpeed; 
 		float zoom; 
-		float rotySpeed;
-		float roty;
-		float rotxSpeed; 
-		float rotx;
-		float rotyPrev;
-		float rotxPrev;
 		float moveSpeed; 
 		float posX;
 		float posY;
@@ -39,7 +33,9 @@ class CameraControl: public QObject
 		void CameraUpdated();
 		
 	public:
-		CameraControl(CameraObject* camObj);
+		bool enabled; 
+	
+		CameraControl2D(CameraObject* camObj);
 		void mousePressEvent(QMouseEvent *event);
 		void mouseReleaseEvent(QMouseEvent *event);
 		void wheelEvent(QWheelEvent *event);

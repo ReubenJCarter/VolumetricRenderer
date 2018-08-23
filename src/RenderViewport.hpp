@@ -14,7 +14,8 @@
 #include "Renderer/Texture3D.hpp"
 #include "Renderer/TextureCube.hpp"
 #include "Renderer/Texture1D.hpp"
-#include "Renderer/CameraControl.hpp"
+#include "Renderer/CameraControl3D.hpp"
+#include "Renderer/CameraControl2D.hpp"
 #include "Renderer/AxisObject.hpp"
 
 
@@ -40,7 +41,8 @@ class RenderViewport: public QOpenGLWidget
 		enum RENDER_TYPE{IMAGE2D_RENDERER, SLICE_RENDER, RAY_RENDER, PHOTON_RENDER}; 
 		RENDER_TYPE renderType; 
 		CameraObject* cameraObject; 
-		CameraControl* cameraControl; 
+		CameraControl3D* cameraControl3D; 
+		CameraControl2D* cameraControl2D; 
 		TextureVolumeObject* textureVolumeObject; 
 		RayVolumeObject* rayVolumeObject; 
 		PhotonVolumeObject* photonVolumeObject;

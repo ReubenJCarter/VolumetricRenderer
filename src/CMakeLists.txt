@@ -21,7 +21,8 @@ set (volumetricRendererSrc
 		Renderer/PhotonVolumeObject.cpp
 		Renderer/TextureSliceObject.cpp
 		Renderer/CameraObject.cpp
-		Renderer/CameraControl.cpp
+		Renderer/CameraControl3D.cpp
+		Renderer/CameraControl2D.cpp
 		Renderer/AxisObject.cpp
 		
 		IO/Image3DFromDicomFile.cpp

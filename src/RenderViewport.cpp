@@ -36,9 +36,18 @@ void RenderViewport::initializeGL()
     ogl->glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	
 	cameraObject = new CameraObject;
-	cameraControl = new CameraControl(cameraObject);
+	cameraControl3D = new CameraControl3D(cameraObject);
 	
-	connect(cameraControl, &CameraControl::CameraUpdated, [this](){photonVolumeObject->ClearPhotonRender(windowWidth, windowHeight); update(); });
+	cameraControl3D->enabled = false; 
+	
+	connect(cameraControl3D, &CameraControl3D::CameraUpdated, [this](){photonVolumeObject->ClearPhotonRender(windowWidth, windowHeight); update(); });
+	
+	
+	
+	cameraControl2D = new CameraControl2D(cameraObject);
+	cameraControl2D->enabled = false; 
+	connect(cameraControl2D, &CameraControl2D::CameraUpdated, [this](){photonVolumeObject->ClearPhotonRender(windowWidth, windowHeight); update(); });
+	
 	
 	TextureVolumeObject::InitSystem(); 
 	textureVolumeObject = new TextureVolumeObject;
@@ -150,32 +159,38 @@ void RenderViewport::paintGL()
 
 void RenderViewport::mousePressEvent(QMouseEvent *event)
 {
-	cameraControl->mousePressEvent(event);
+	cameraControl3D->mousePressEvent(event);
+	cameraControl2D->mousePressEvent(event);
 }
 
 void RenderViewport::mouseReleaseEvent(QMouseEvent *event)
 {
-	cameraControl->mouseReleaseEvent(event);
+	cameraControl3D->mouseReleaseEvent(event);
+	cameraControl2D->mouseReleaseEvent(event);
 }
 
 void RenderViewport::mouseMoveEvent(QMouseEvent *event)
 {
-	cameraControl->mouseMoveEvent(event); 
+	cameraControl3D->mouseMoveEvent(event); 
+	cameraControl2D->mouseMoveEvent(event); 
 }
 
 void RenderViewport::wheelEvent(QWheelEvent *event)
 {
-	cameraControl->wheelEvent(event); 
+	cameraControl3D->wheelEvent(event); 
+	cameraControl2D->wheelEvent(event); 
 }
 
 void RenderViewport::keyPressEvent(QKeyEvent *event)
 {
-	cameraControl->keyPressEvent(event);
+	cameraControl3D->keyPressEvent(event);
+	cameraControl2D->keyPressEvent(event);
 }
 
 void RenderViewport::keyReleaseEvent(QKeyEvent *event)
 {
-	cameraControl->keyReleaseEvent(event); 
+	cameraControl3D->keyReleaseEvent(event); 
+	cameraControl2D->keyReleaseEvent(event); 
 }
 
 void RenderViewport::EnableDisableAxis(bool en)
@@ -318,9 +333,17 @@ void RenderViewport::ChooseRenderer(RENDER_TYPE rt)
 	
 	
 	if(renderType == IMAGE2D_RENDERER)
+	{
 		cameraObject->SetOrtho(true);
+		cameraControl3D->enabled = false; 
+		cameraControl2D->enabled = true; 
+	}
 	else
+	{
 		cameraObject->SetOrtho(false); 
+		cameraControl3D->enabled = true;
+		cameraControl2D->enabled = false;
+	}
 	
 	Refresh();
 }
