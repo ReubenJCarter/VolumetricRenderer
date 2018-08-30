@@ -666,7 +666,7 @@ void Image3D::Sobel(Image3D& inImg)
 							   
 							   vals[18] * 1.0 + vals[19] * 2.0 + vals[20] * 1.0 +  
 							   vals[21] * 2.0 + vals[22] * 4.0 + vals[23] * 2.0 +  
-							   vals[24] * 1.0 + vals[25] * 2.0 + vals[26] * 1.0)/22.0;
+							   vals[24] * 1.0 + vals[25] * 2.0 + vals[26] * 1.0)/16.0;
 							   
 							   
 				double gradY =(vals[0] * -1.0 + vals[1] * -2.0 + vals[2] * -1.0 + 
@@ -679,7 +679,7 @@ void Image3D::Sobel(Image3D& inImg)
 							   
 							   vals[18] * -1.0 + vals[19] * -2.0 + vals[20] * -1.0 + 
 							   vals[21] * 0    + vals[22] * 0    + vals[23] * 0 + 
-							   vals[24] * 1.0  + vals[25] * 2.0  + vals[26] * 1.0)/22.0;
+							   vals[24] * 1.0  + vals[25] * 2.0  + vals[26] * 1.0)/16.0;
 							   
 				double gradX = (vals[0] * -1.0 + vals[1] * 0 + vals[2] * 1.0 + 
 							   vals[3] * -2.0  + vals[4] * 0 + vals[5] * 2.0 + 
@@ -691,7 +691,7 @@ void Image3D::Sobel(Image3D& inImg)
 							   
 							   vals[18] * -1.0 + vals[19] * 0 + vals[20] * 1.0 + 
 							   vals[21] * -2.0 + vals[22] * 0 + vals[23] * 2.0 + 
-							   vals[24] * -1.0 + vals[25] * 0 + vals[26] * 1.0)/22.0;
+							   vals[24] * -1.0 + vals[25] * 0 + vals[26] * 1.0)/16.0;
 				
 				
 				((unsigned char*)data)[(z * width * height + y * width + x) * pixelSize + 0] = ((int)gradX + 255) / 2;
@@ -772,7 +772,7 @@ void Image3D::Sobel(Image3D& inImg)
 							   
 							   vals[18] * 1.0 + vals[19] * 2.0 + vals[20] * 1.0 +  
 							   vals[21] * 2.0 + vals[22] * 4.0 + vals[23] * 2.0 +  
-							   vals[24] * 1.0 + vals[25] * 2.0 + vals[26] * 1.0)/22.0;
+							   vals[24] * 1.0 + vals[25] * 2.0 + vals[26] * 1.0)/16.0;
 							   
 							   
 				double gradY =(vals[0] * -1.0 + vals[1] * -2.0 + vals[2] * -1.0 + 
@@ -785,7 +785,7 @@ void Image3D::Sobel(Image3D& inImg)
 							   
 							   vals[18] * -1.0 + vals[19] * -2.0 + vals[20] * -1.0 + 
 							   vals[21] * 0    + vals[22] * 0    + vals[23] * 0 + 
-							   vals[24] * 1.0  + vals[25] * 2.0  + vals[26] * 1.0)/22.0;
+							   vals[24] * 1.0  + vals[25] * 2.0  + vals[26] * 1.0)/16.0;
 							   
 				double gradX = (vals[0] * -1.0 + vals[1] * 0 + vals[2] * 1.0 + 
 							   vals[3] * -2.0  + vals[4] * 0 + vals[5] * 2.0 + 
@@ -797,7 +797,7 @@ void Image3D::Sobel(Image3D& inImg)
 							   
 							   vals[18] * -1.0 + vals[19] * 0 + vals[20] * 1.0 + 
 							   vals[21] * -2.0 + vals[22] * 0 + vals[23] * 2.0 + 
-							   vals[24] * -1.0 + vals[25] * 0 + vals[26] * 1.0)/22.0;
+							   vals[24] * -1.0 + vals[25] * 0 + vals[26] * 1.0)/16.0;
 				
 				
 				double gX = (gradX + 65535.0) / 2.0;
