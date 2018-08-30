@@ -31,6 +31,7 @@ class Image3D
 		void Median();
 		void CentralDifference(Image3D& inImg);
 		void Sobel(Image3D& inImg);
+		void Sobel2(Image3D& inImg);
 		void Normalize();
 		void Histogram(std::vector<float>* histogram);
 		void BrightnessContrastThreshold(double brightness, double contrast, double threshold);
