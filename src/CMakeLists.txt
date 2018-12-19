@@ -26,8 +26,6 @@ set (volumetricRendererSrc
 		Renderer/AxisObject.cpp
 		
 		IO/Image3DFromDicomFile.cpp
-		IO/Image3DFromTIFFFile.cpp
-		IO/Image3DFromPNGFile.cpp
 		IO/Image3DFromDevilFile.cpp
 		IO/Image3DFromNRRDFile.cpp
 )
@@ -38,15 +36,11 @@ target_link_libraries(VolumetricRenderer Qt5::Core Qt5::Widgets Qt5::OpenGL)
 
 target_link_libraries(VolumetricRenderer dcmdata dcmimgle dcmimage )
 
-target_link_libraries(VolumetricRenderer tiff)
-
-target_link_libraries(VolumetricRenderer libpng16)
-
 target_link_libraries(VolumetricRenderer DevIL)
 
 target_link_libraries(VolumetricRenderer teem)
 
-target_link_libraries(VolumetricRenderer opencv_world341d)
+target_link_libraries(VolumetricRenderer opencv_world400)
 
 install(TARGETS VolumetricRenderer
 		RUNTIME

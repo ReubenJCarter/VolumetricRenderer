@@ -1,10 +1,10 @@
-#include "Image3DFromDicomFile.hpp"
-
-
 #include <dcmtk/config/osconfig.h>    /* make sure OS specific configuration is included first */
 #include <dcmtk/dcmdata/dctk.h>
 #include <dcmtk/dcmimage/diregist.h>
 #include <dcmtk/dcmimgle/dcmimage.h>
+
+#include "Image3DFromDicomFile.hpp"
+
 
 
 

@@ -18,10 +18,8 @@ class VolumeData
 		bool BuildFromImage3D();
 		void ImportDicomFile(QString fileName);
 		void ImportDicomFileSequence(QStringList fileNames);
-		void ImportTIFFFile(QString fileName);
 		void ImportImageFile(QString fileName);
 		void ImportNRRDFile(QString fileName);
-		void ImportTIFFFileSequence(QStringList fileNames);
 		void ImportImageFileSequence(QStringList fileNames);
 		void ApplyBCTSettings(double b, double c, double t);
 };

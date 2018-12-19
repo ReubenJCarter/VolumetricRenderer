@@ -4,8 +4,6 @@
 #include "Util.hpp"
 
 #include "IO/Image3DFromDicomFile.hpp"
-#include "IO/Image3DFromTIFFFile.hpp"
-#include "IO/Image3DFromPNGFile.hpp"
 #include "IO/Image3DFromDevilFile.hpp"
 #include "IO/Image3DFromNRRDFile.hpp"
 
@@ -25,20 +23,6 @@ void VolumeData::ImportDicomFileSequence(QStringList fileNames)
 		return; 
 	textureVolume.Allocate(intensityImage.Width(), intensityImage.Height(), intensityImage.Depth());
 	textureVolume.LoadData(intensityImage.Data());
-}
-
-void VolumeData::ImportTIFFFile(QString fileName)
-{
-	bool loadGood = Image3DFromTIFFFile(&intensityImage, fileName.toStdString());
-	if(!loadGood)
-		return;
-	
-	loadGood = BuildFromImage3D();
-	
-	if(!loadGood)
-		return;
-	
-	
 }
 
 void VolumeData::ImportImageFile(QString fileName)
@@ -67,24 +51,6 @@ void VolumeData::ImportNRRDFile(QString fileName)
 		return;
 	
 	
-	
-	
-}
-
-void VolumeData::ImportTIFFFileSequence(QStringList fileNames)
-{
-	std::vector<std::string> files;
-	for(int i = 0; i < fileNames.size(); i++)
-		files.push_back(fileNames.at(i).toStdString());
-	
-	bool loadGood = Image3DFromTIFFFileSequence(&intensityImage, files);
-	if(!loadGood)
-		return;
-	
-	loadGood = BuildFromImage3D();
-
-	if(!loadGood)
-		return;
 	
 	
 }

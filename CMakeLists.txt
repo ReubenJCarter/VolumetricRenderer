@@ -23,28 +23,12 @@ set(GLM_INC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ext/glm CACHE PATH "Path to GLM")
 include_directories(${GLM_INC_DIR})
 
 #DCMTK
-set(DCMTK_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ext/dcmtk/build/install CACHE PATH "Path to DCMTK")
+set(DCMTK_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ext/dcmtk-3.6.4/build/install CACHE PATH "Path to DCMTK")
 set(DCMTK_INC_DIR ${DCMTK_ROOT_DIR}/include)
 set(DCMTK_LIB_DIR ${DCMTK_ROOT_DIR}/lib)
 set(DCMTK_BIN_DIR ${DCMTK_ROOT_DIR}/bin)
 include_directories(${DCMTK_INC_DIR})
 link_directories(${DCMTK_LIB_DIR})
-
-#libtiff
-set(LIBTIFF_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ext/libtiff/build/install CACHE PATH "Path to libtiff")
-set(LIBTIFF_INC_DIR ${LIBTIFF_ROOT_DIR}/include)
-set(LIBTIFF_LIB_DIR ${LIBTIFF_ROOT_DIR}/lib)
-set(LIBTIFF_BIN_DIR ${LIBTIFF_ROOT_DIR}/bin)
-include_directories(${LIBTIFF_INC_DIR})
-link_directories(${LIBTIFF_LIB_DIR})
-
-#libpng
-set(LIBPNG_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ext/libpng/build/install CACHE PATH "Path to libpng")
-set(LIBPNG_INC_DIR ${LIBPNG_ROOT_DIR}/include)
-set(LIBPNG_LIB_DIR ${LIBPNG_ROOT_DIR}/lib)
-set(LIBPNG_BIN_DIR ${LIBPNG_ROOT_DIR}/bin)
-include_directories(${LIBPNG_INC_DIR})
-link_directories(${LIBPNG_LIB_DIR})
 
 #devil
 set(DEVIL_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ext/devil CACHE PATH "Path to Devil")
@@ -55,7 +39,7 @@ include_directories(${DEVIL_INC_DIR})
 link_directories(${DEVIL_LIB_DIR})
 
 #teem
-set(TEEM_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ext/teem/build/install CACHE PATH "Path to Teem")
+set(TEEM_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ext/teem-1.11.0-src/build/install CACHE PATH "Path to Teem")
 set(TEEM_INC_DIR ${TEEM_ROOT_DIR}/include)
 set(TEEM_LIB_DIR ${TEEM_ROOT_DIR}/lib)
 set(TEEM_BIN_DIR ${TEEM_ROOT_DIR}/bin)
@@ -77,7 +61,8 @@ add_subdirectory(src)
 
 
 #installer stuff
-set(QT_BIN_DIR "C:/Qt/5.10.1/msvc2017_64/bin")
+set(QT_BIN_DIR "C:/Qt/5.12.0/msvc2017_64/bin" CACHE PATH "Path to QT binary files ")
+
 install(FILES ${QT_BIN_DIR}/Qt5Core.dll
 			  ${QT_BIN_DIR}/Qt5Gui.dll
 			  ${QT_BIN_DIR}/Qt5Widgets.dll
@@ -85,8 +70,6 @@ install(FILES ${QT_BIN_DIR}/Qt5Core.dll
 			  ${QT_BIN_DIR}/Qt5OpenGL.dll
 			  ${QT_BIN_DIR}/Qt5Concurrent.dll
 			  ${QT_BIN_DIR}/../plugins/platforms/qwindows.dll
-			  ${LIBTIFF_BIN_DIR}/tiff.dll
-			  ${LIBTIFF_BIN_DIR}/tiffxx.dll
 			  ${DCMTK_BIN_DIR}/dcmdata.dll
 			  ${DCMTK_BIN_DIR}/dcmdsig.dll
 			  ${DCMTK_BIN_DIR}/dcmfg.dll
@@ -111,11 +94,11 @@ install(FILES ${QT_BIN_DIR}/Qt5Core.dll
 			  ${DCMTK_BIN_DIR}/ijg16.dll
 			  ${DCMTK_BIN_DIR}/oflog.dll
 			  ${DCMTK_BIN_DIR}/ofstd.dll
-			  ${LIBPNG_BIN_DIR}/libpng16.dll
 			  ${DEVIL_BIN_DIR}/DevIL.dll
 			  ${TEEM_BIN_DIR}/teem.dll
-			  ${OPENCV_BIN_DIR}/opencv_world341d.dll
-			  ${OPENCV_BIN_DIR}/opencv_ffmpeg341_64.dll
+			  ${OPENCV_BIN_DIR}/opencv_world400.dll
+			  ${OPENCV_BIN_DIR}/opencv_world400d.dll
+			  ${OPENCV_BIN_DIR}/opencv_ffmpeg400_64.dll
 		DESTINATION bin
 		COMPONENT MainApplication
 )
